@@ -1,0 +1,71 @@
+Procedimiento para Desarrollar la Práctica
+
+La practica ha sido realizada con Python, usando librerías como numpy, matplotlib.pyplot,
+pandas, time, os. El código fuente se divide en tres ficheros.
+
+->config.py
+    Esto es un fichero de configuración donde podremos configurar que tipo de ejecución
+    queremos realizar. Parametros y su explicaciones:
+
+    SEMILLA
+        Con este parámetro podemos indicar la semilla que se inicializara por cada ejecución de
+        un algoritmo. Esto ha sido decidido para poder comparar algoritmos parecidos como en mi
+        caso la búsqueda local con los dos tipos de vecindarios. Gracias a esta inicialización nueva
+        de la semilla por cada problema, ambos algoritmos crearan la misma solución inicial.
+        Facilitando la comparación de un problema concreto con los dos tipos de algoritmos.
+    
+    MAX EVALUACIONES
+        Con este parámetro se decide el numero de evaluaciones totales de soluciones.
+    
+    PARTE FUNCION OBJETIVO
+        ENTENDER FACTIVILIDAD DE SOLUCION COMO PARTE FUNCION OBJETIVO.
+        Este parámetro que se indica con True o False es una aclaración al parámetro anterior
+        y es para decidir si la factibilidad de una solución es decir si no sobrepasa el peso de la
+        mochila cuenta o no para el limeta del parámetro anterior.
+    
+    MEJORA BL
+        Este parámetro es para decidir si ejecutar o no el algoritmo extra de Búsqueda local
+        que amplia el vecindario. Teniendo la capacidad de añadir mas elementos a la mochila
+        que la solución inicial. Esto seria una Búsqueda local pero con Búsqueda en Entornos
+        Variables. Ya que lo que hace es buscar en un entorno mayor solo si en el entorno inicial
+        se queda en un óptimo local para dicho entorno.
+    
+    MOSTRAR CADA SALIDA
+        Con este parámetro decidimos si queremos la salida por terminal de cada una de las
+        soluciones de todos los problemas ejecutados. Es la única forma de ver una solución, ya
+        que si este parámetro se encuentra a False la única salida del programa sera las tablas de
+        comparación donde solo se muestran medias de beneficios y tiempos.
+    
+    MOSTRAR GRAFICAS
+        Este parámetro se usa para indicar que al final de la ejecución de todo el programa se
+        nos muestre dos gráficas (primero una y cuando se cierre esta, se mostrara la segunda)
+        donde podemos ver una gráfica de barras para comparar los beneficio y tiempos para los
+        distintos algoritmos y problemas ejecutados.
+    
+    SOLO EJECUTAR X
+        Esto realmente son 3 parámetros una por cada tamaño posible del problema (100,
+        200, 300) son parámetros booleanos donde si están todos a False se ejecutan todos los
+        problemas del dataset. Pero indicando solo uno de ellos a true la ejecución solo se realizará
+        para los problemas del tamaño indicado por ese parámetro. Si se iguala mas de uno a
+        true dará un error.
+    
+    HACER TXT DE TABLA EJECUCION
+        Este parámetro es simplemente para almacenar en un txt una tabla con todas las
+        ejecuciones. Se almacenara en ejecucion completa.txt en la misma ubicación que main.py
+        y config.py. Esto podrá usarse para posteriores análisis.
+    
+    VER GRAFICAS
+        VER GRAFICA DE MEJORA SOLO PARA UN PROBLEMA. Esto anula todos los
+        parámetros anteriores ( menos 5.1.1; 5.1.2; 5.1.3) y realiza una única ejecución de un
+        problema concreto para comparar las mejoras en los beneficios por vecindario explorado para los algoritmos BL y BL+. 
+        El problema concreto se indica como: PROBLEMA PARA VER GRAFICA = 'data/jeu 100 50 2.txt' que es otro parametro.
+
+->algoritmosV3.py
+    Esta es la ultima versión que recoge todas las clases y funciones explicadas durante
+    los puntos 2, 3 y 4 de la documentacion.
+
+->main.py
+    Este es realmente el código ejecutable de python donde (de una manera un poco
+    desordenado :P) ejecuta los algoritmos de la forma indicada en el fichero config.py. El
+    proceso de ejecución es primero en el fichero de config.py editar los parámetros que
+    deseemos y posteriormente ejecutar el main.py con python.
