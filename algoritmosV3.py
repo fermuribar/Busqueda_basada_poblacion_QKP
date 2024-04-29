@@ -122,7 +122,7 @@ class Problema:
         self.solucion_actual.beneficio = 0
     
     #da una solucion inicial aleatoria 
-    def solucion_inicial(self) -> np.ndarray:
+    def solucion_inicial(self) -> Solucion:
         # Permuta los indices de manera aleatoria
         indices_aleatorios = np.random.permutation(np.arange(0, self.solucion_actual.solucion.shape[0]))
         for indice in indices_aleatorios:
@@ -183,7 +183,67 @@ class Problema:
             
         return False
     
+    def poblacion_inicial(self) -> list:
+        pop = []
+        for i in range(0,conf.POBLACION):
+            self.solucion_actual = Solucion()
+            self.solucion_actual.solucion = np.zeros(self.vector_pesos.shape[0])
+            self.solucion_actual.peso = self.peso_max
+            self.solucion_actual.beneficio = 0
+            pop.append(self.solucion_inicial())
+        return pop
+    
+    def cruce_intercambio_puntos(self, padre1, padre2) -> tuple:
+        indices_cruce = np.random.randint(0,padre1.shape[0], size=2)
+        hijo1 = padre1.copy()
+        hijo2 = padre2.copy()
 
+        for i in range(indices_cruce.min(), indices_cruce.max() + 1):
+            hijo1[i] = padre2[i]
+            hijo2[i] = padre1[i]
+
+        if not self.factible(hijo1):
+            indices_1_hijo1 = np.where(hijo1 == 1)[0]
+            aleatorios_hijo1 = np.random.permutation(np.arange(0, indices_1_hijo1.shape[0]))
+
+        h = 0
+        while not self.factible(hijo1):
+            hijo1[indices_1_hijo1[aleatorios_hijo1[h]]] = 0
+            h += 1
+
+        if not self.factible(hijo2):
+            indices_1_hijo2 = np.where(hijo2 == 1)[0]
+            aleatorios_hijo2 = np.random.permutation(np.arange(0, indices_1_hijo2.shape[0]))
+
+        h = 0
+        while not self.factible(hijo2):
+            hijo2[indices_1_hijo2[aleatorios_hijo2[h]]] = 0
+            h += 1
+        
+        hijo1 = self.calculo_solucion(hijo1)
+        hijo2 = self.calculo_solucion(hijo2)
+        return (hijo1, hijo2)
+    
+    def mutacion(self, sol) -> Solucion:
+        mutada = sol.copy()
+        m = 0
+        while m < sol.shape[0]*conf.PROBABILIDAD_MUTACION:
+            indices_mutado = np.random.randint(0, sol.shape[0])
+            mutada[indices_mutado] = 1 if mutada[indices_mutado] == 0 else 0
+            if self.factible(mutada):
+                m += 1
+            else:
+                mutada[indices_mutado] = 1 if mutada[indices_mutado] == 0 else 0
+        
+        return self.calculo_solucion(mutada)
+
+#   ____  _      
+#  |  _ \| |     
+#  | |_) | |     
+#  |  _ <| |     
+#  | |_) | |____ 
+#  |____/|______|
+    
 def BL_primer_mejor(matriz_valor, peso_max, vector_pesos, vecindario = 0) -> Solucion:
     prob = Problema(matriz_valor, peso_max, vector_pesos)
     prob.solucion_inicial()
@@ -268,3 +328,110 @@ def greedy(matriz_valor, peso_max, vector_pesos) -> Solucion:
     prob = Problema(matriz_valor, peso_max, vector_pesos)
     solucion = prob.calculo_solucion(solucion)
     return solucion
+
+#            _____  _____ 
+#      /\   / ____|/ ____|
+#     /  \ | |  __| |  __ 
+#    / /\ \| | |_ | | |_ |
+#   / ____ \ |__| | |__| |
+#  /_/    \_\_____|\_____|
+
+def torneo_binario(pop):
+    #indices random
+    pos1 = np.random.randint(0, conf.POBLACION)
+    pos2 = np.random.randint(0, conf.POBLACION)
+
+    #asegura que son distintos
+    while pos2 == pos1:
+        pos2 = np.random.randint(0, conf.POBLACION)
+
+    if pop[pos1].beneficio < pop[pos2].beneficio:
+        return pop[pos2]
+    else:
+        return pop[pos1]
+    
+def mejor_de_pop(pop):
+    mejor = Solucion()
+    mejor.beneficio = 0
+    for indi in pop:
+        if indi.beneficio > mejor.beneficio:
+            mejor = indi
+    return mejor
+
+def peor_de_pop(pop):
+    peor = Solucion()
+    peor.beneficio = 1_000_000_000
+    for indi in pop:
+        if indi.beneficio < peor.beneficio:
+            peor = indi
+    return peor
+
+
+
+def agg(matriz_valor, peso_max, vector_pesos, cruce = 0) -> Solucion:
+    p = Problema(matriz_valor, peso_max, vector_pesos)
+    pop = p.poblacion_inicial()
+    newpop = pop.copy()
+    evaluadas = len(pop)
+
+    mejor = mejor_de_pop(pop)
+
+    while evaluadas < conf.MAX_EVALUACIONES:
+        #seleccion
+        for i in newpop:
+            #Copia el ganador del torneo
+            ganador = torneo_binario(pop)
+            i = ganador
+
+        #numero de cruces
+        total_cruces = conf.POBLACION*conf.PROBABILIDAD_CRUZE
+
+        i = 0
+        while i < total_cruces:
+            p1 = pop[i]
+            p2 = pop[i+1]
+            h1, h2 = p.cruce_intercambio_puntos(p1.solucion,p2.solucion)
+            newpop[i] = h1
+            newpop[i+1] = h2
+            i += 2
+            evaluadas += 2
+
+        #mutacion
+        total_mutar = conf.POBLACION*conf.PROBABILIDAD_MUTACION
+
+        for i in range(0, int(total_mutar)):
+            posi = np.random.randint(0, conf.POBLACION)
+            newpop[posi] = p.mutacion(pop[posi].solucion)
+            evaluadas += 1
+
+        mejor_new = mejor_de_pop(newpop)
+        
+        if mejor.beneficio > mejor_new.beneficio:
+            peor = peor_de_pop(newpop)
+            peor.solucion = mejor.solucion.copy()
+            peor.beneficio = mejor.beneficio
+        else:
+            mejor = mejor_new
+
+        #Remplazo
+        pop = newpop.copy()
+    
+    return mejor_de_pop(pop)
+
+        
+
+
+
+        
+
+
+
+
+
+
+#            _____ ______ 
+#      /\   / ____|  ____|
+#     /  \ | |  __| |__   
+#    / /\ \| | |_ |  __|  
+#   / ____ \ |__| | |____ 
+#  /_/    \_\_____|______|

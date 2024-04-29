@@ -8,9 +8,9 @@
 #semilla aleatoria
 SEMILLA = 777
 MAX_EVALUACIONES = 90000
-ENTENDER_FACTIVILIDAD_DE_SOLUCION_COMO_PARTE_FUNCION_OBJETIVO = True
+ENTENDER_FACTIVILIDAD_DE_SOLUCION_COMO_PARTE_FUNCION_OBJETIVO = False
 # ^ Si esta a true la ajecucion de todos los problemas con MEJORA_BL tarda unos 5 min | si False tarda 15 min
-MEJORA_BL = True
+MEJORA_BL = False
 
 MOSTRAR_CADA_SALIDA = True
 MOSTRAR_GRAFICAS = True
@@ -25,3 +25,9 @@ VER_GRAFICA_DE_MEJORA_SOLO_PARA_UN_PROBLEMA = False
 PROBLEMA_PARA_VER_GRAFICA = 'data/jeu_300_50_5.txt'
 
 CLEAR = 'clear' #comando para limpiar pantalla en tu SO
+
+
+POBLACION = 50
+
+PROBABILIDAD_CRUZE = 0.68
+PROBABILIDAD_MUTACION = 0.08
