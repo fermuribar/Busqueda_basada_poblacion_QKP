@@ -183,7 +183,7 @@ def main():
     print('[*][·][]Tabla Resultados para agg')
     print(resultados_agg)
     print('')
-    print('[*][·][]Tabla Resultados para agg')
+    print('[*][·][]Tabla Resultados para age')
     print(resultados_age)
     print('')
     if conf.MEJORA_BL:

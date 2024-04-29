@@ -447,7 +447,18 @@ def ramplazar_peores(pop, h1, h2):
                 sw = True
 
         if sw:
-            pop = sorted(pop, key=lambda x: x.beneficio)
+            #pop = sorted(pop, key=lambda x: x.beneficio)
+            for i in range(0,2):
+                i = conf.POBLACION - 1
+                while i > 0:
+                    if pop[i].beneficio > pop[i-1].beneficio:
+                        aux = pop[i]
+                        pop[i] = pop[i-1]
+                        pop[i-1] = aux
+                    else:
+                        break
+                    i -= 1
+
 
 
 def age(matriz_valor, peso_max, vector_pesos, cruce = 0) -> Solucion:
