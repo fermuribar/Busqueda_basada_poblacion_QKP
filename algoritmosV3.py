@@ -366,8 +366,6 @@ def peor_de_pop(pop):
             peor = indi
     return peor
 
-
-
 def agg(matriz_valor, peso_max, vector_pesos, cruce = 0) -> Solucion:
     p = Problema(matriz_valor, peso_max, vector_pesos)
     pop = p.poblacion_inicial()
@@ -418,20 +416,66 @@ def agg(matriz_valor, peso_max, vector_pesos, cruce = 0) -> Solucion:
     
     return mejor_de_pop(pop)
 
-        
-
-
-
-        
-
-
-
-
-
-
 #            _____ ______ 
 #      /\   / ____|  ____|
 #     /  \ | |  __| |__   
 #    / /\ \| | |_ |  __|  
 #   / ____ \ |__| | |____ 
 #  /_/    \_\_____|______|
+
+def ramplazar_peores(pop, h1, h2):
+    sw = False
+    if h1.beneficio > h2.beneficio:
+        if h1.beneficio > pop[-2].beneficio:
+            pop[-1] = h1
+            if h2.beneficio > pop[-1].beneficio:
+                pop[-2] = h2
+            sw = True
+        else:
+            if h1.beneficio > pop[-1].beneficio:
+                pop[-2] = h1
+                sw = True
+    else:
+        if h2.beneficio > pop[-2].beneficio:
+            pop[-2] = h2
+            if h1.beneficio > pop[-1].beneficio:
+                pop[-1] = h1
+            sw = True
+        else:
+            if h2.beneficio > pop[-1].beneficio:
+                pop[-1] = h2
+                sw = True
+
+        if sw:
+            pop = sorted(pop, key=lambda x: x.beneficio)
+
+
+def age(matriz_valor, peso_max, vector_pesos, cruce = 0) -> Solucion:
+    p = Problema(matriz_valor, peso_max, vector_pesos)
+    pop = p.poblacion_inicial()
+    newpop = pop.copy()
+    evaluadas = conf.POBLACION
+    pop = sorted(pop, key=lambda x: x.beneficio)
+
+    while evaluadas < conf.MAX_EVALUACIONES:
+        #Seleccion por torneo
+        padre1 = torneo_binario(pop)
+        padre2 = torneo_binario(pop)
+
+        #cruce
+        h1, h2 = p.cruce_intercambio_puntos(padre1.solucion,padre2.solucion)
+
+        #mutacion
+        if conf.PROBABILIDAD_CRUZE >= np.random.rand():
+            h1 = p.mutacion(h1.solucion)
+
+        if conf.PROBABILIDAD_CRUZE >= np.random.rand():
+            h2 = p.mutacion(h2.solucion)
+        
+        evaluadas += 2
+
+        #Remplaza los dos peores
+        ramplazar_peores(pop, h1, h2)
+
+    return mejor_de_pop(pop)
+

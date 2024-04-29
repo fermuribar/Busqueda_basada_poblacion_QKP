@@ -29,9 +29,9 @@ def main():
 
     # Crear un DataFrame vacío con las columnas específicas
     if conf.MEJORA_BL:
-        columnas = ['Nombre del problema', 'Solucion BL', 'Peso BL', 'Bondad BL', 'Tiempo BL', 'Solucion Greedy', 'Peso Greedy', 'Bondad Greedy', 'Tiempo Greedy', 'Peso agg', 'Bondad agg', 'Tiempo agg', 'Solucion B+', 'Peso BL+', 'Bondad BL+', 'Tiempo BL+']
+        columnas = ['Nombre del problema', 'Solucion BL', 'Peso BL', 'Bondad BL', 'Tiempo BL', 'Solucion Greedy', 'Peso Greedy', 'Bondad Greedy', 'Tiempo Greedy', 'Peso agg', 'Bondad agg', 'Tiempo agg', 'Peso age', 'Bondad age', 'Tiempo age', 'Solucion B+', 'Peso BL+', 'Bondad BL+', 'Tiempo BL+']
     else:
-        columnas = ['Nombre del problema', 'Solucion BL', 'Peso BL', 'Bondad BL', 'Tiempo BL', 'Solucion Greedy', 'Peso Greedy', 'Bondad Greedy', 'Tiempo Greedy', 'Peso agg', 'Bondad agg', 'Tiempo agg']
+        columnas = ['Nombre del problema', 'Solucion BL', 'Peso BL', 'Bondad BL', 'Tiempo BL', 'Solucion Greedy', 'Peso Greedy', 'Bondad Greedy', 'Tiempo Greedy', 'Peso agg', 'Bondad agg', 'Tiempo agg', 'Peso age', 'Bondad age', 'Tiempo age']
         
     tabla = pd.DataFrame(columns=columnas)
     # Uso de la función
@@ -99,6 +99,15 @@ def main():
                     print("Agg -> ({}) Con un peso disponible de: {}    y bondad total de: {} ||T {}".format(ruta_archivo, peso_maximo - sol_agg.peso ,sol_agg.beneficio, duracion_agg))
                     print('')
 
+                inicio = time.time()
+                sol_age = alg.age(matriz_valores, peso_maximo, vector_pesos)
+                fin = time.time()
+                duracion_age = fin - inicio
+                if conf.MOSTRAR_CADA_SALIDA:
+                    print(sol.solucion.astype(int))
+                    print("Age -> ({}) Con un peso disponible de: {}    y bondad total de: {} ||T {}".format(ruta_archivo, peso_maximo - sol_age.peso ,sol_age.beneficio, duracion_age))
+                    print('')
+
                 if conf.MEJORA_BL:
                     np.random.seed(conf.SEMILLA)
                     inicio = time.time()
@@ -110,9 +119,9 @@ def main():
                         print("BL+ -> ({}) Con un peso disponible de: {}    y bondad total de: {} ||T {}".format(ruta_archivo, peso_maximo - solucion_mejora.peso ,solucion_mejora.beneficio, duracion_BL_mejora))
                         print('')
                         
-                    tabla.loc[len(tabla)] = [ruta_archivo, solucion.solucion, solucion.peso, solucion.beneficio, duracion_BL, sol.solucion, sol.peso, sol.beneficio, duracion_Greedy, sol_agg.peso, sol_agg.beneficio, duracion_agg, solucion_mejora.solucion, solucion_mejora.peso, solucion_mejora.beneficio, duracion_BL_mejora]
+                    tabla.loc[len(tabla)] = [ruta_archivo, solucion.solucion, solucion.peso, solucion.beneficio, duracion_BL, sol.solucion, sol.peso, sol.beneficio, duracion_Greedy, sol_agg.peso, sol_agg.beneficio, duracion_agg, sol_age.peso, sol_age.beneficio, duracion_age, solucion_mejora.solucion, solucion_mejora.peso, solucion_mejora.beneficio, duracion_BL_mejora]
                 else:
-                    tabla.loc[len(tabla)] = [ruta_archivo, solucion.solucion, solucion.peso, solucion.beneficio, duracion_BL, sol.solucion, sol.peso, sol.beneficio, duracion_Greedy, sol_agg.peso, sol_agg.beneficio, duracion_agg]
+                    tabla.loc[len(tabla)] = [ruta_archivo, solucion.solucion, solucion.peso, solucion.beneficio, duracion_BL, sol.solucion, sol.peso, sol.beneficio, duracion_Greedy, sol_agg.peso, sol_agg.beneficio, duracion_agg, sol_age.peso, sol_age.beneficio, duracion_age]
                 print('')
     
     if not conf.MOSTRAR_CADA_SALIDA:
@@ -155,6 +164,9 @@ def main():
     resultados_agg = tabla.groupby(['Tamaño', 'Densidad'])[['Bondad agg', 'Tiempo agg']].mean().reset_index()
     resultados_agg['Bondad agg'] = resultados_agg['Bondad agg'].round(2)
 
+    resultados_age = tabla.groupby(['Tamaño', 'Densidad'])[['Bondad age', 'Tiempo age']].mean().reset_index()
+    resultados_age['Bondad age'] = resultados_age['Bondad age'].round(2)
+
     if conf.MEJORA_BL:
         resultados_BL_mejora = tabla.groupby(['Tamaño', 'Densidad'])[['Bondad BL+', 'Tiempo BL+']].mean().reset_index()
         resultados_BL_mejora['Bondad BL+'] = resultados_BL_mejora['Bondad BL+'].round(2)
@@ -171,6 +183,9 @@ def main():
     print('[*][·][]Tabla Resultados para agg')
     print(resultados_agg)
     print('')
+    print('[*][·][]Tabla Resultados para agg')
+    print(resultados_age)
+    print('')
     if conf.MEJORA_BL:
         print('[*][·][]Tabla Resultados para BL+')
         print(resultados_BL_mejora)
@@ -182,16 +197,19 @@ def main():
         resultados_BL_c = resultados_BL[resultados_BL['Tamaño'] == i*100]
         resultados_Greedy_c = resultados_Greedy[resultados_Greedy['Tamaño'] == i*100]
         resultados_agg_c = resultados_agg[resultados_agg['Tamaño'] == i*100]
+        resultados_age_c = resultados_age[resultados_age['Tamaño'] == i*100]
 
         # Calcular las medias de Fitness  para cada algoritmo en tamaño 100
         media_BL_c = resultados_BL_c['Bondad BL'].mean().round(2)
         media_Greedy_c = resultados_Greedy_c['Bondad Greedy'].mean().round(2)
         media_agg_c = resultados_agg_c['Bondad agg'].mean().round(2)
+        media_age_c = resultados_age_c['Bondad age'].mean().round(2)
 
         # La media de Tiempo no se redondea, ya que solo queremos redondear la Bondad
         media_tiempo_BL_c = resultados_BL_c['Tiempo BL'].mean()
         media_tiempo_Greedy_c = resultados_Greedy_c['Tiempo Greedy'].mean()
         media_tiempo_agg_c = resultados_agg_c['Tiempo agg'].mean()
+        media_tiempo_age_c = resultados_age_c['Tiempo age'].mean()
 
         if conf.MEJORA_BL:
             resultados_BL_mejora_c = resultados_BL_mejora[resultados_BL_mejora['Tamaño'] == i*100]
@@ -199,16 +217,16 @@ def main():
             media_tiempo_BL_mejora_c = resultados_BL_mejora_c['Tiempo BL+'].mean()
             # Crear un nuevo DataFrame para mostrar los resultados
             resultados_globales_c = pd.DataFrame({
-                'Algoritmo': ['BL', 'Greedy', 'Agg', 'BL+'],
-                'Fitness': [media_BL_c, media_Greedy_c, media_agg_c, media_BL_mejora_c],
-                'Tiempo': [media_tiempo_BL_c, media_tiempo_Greedy_c, media_tiempo_agg_c, media_tiempo_BL_mejora_c]
+                'Algoritmo': ['BL', 'Greedy', 'Agg', 'Age', 'BL+'],
+                'Fitness': [media_BL_c, media_Greedy_c, media_agg_c, media_age_c, media_BL_mejora_c],
+                'Tiempo': [media_tiempo_BL_c, media_tiempo_Greedy_c, media_tiempo_agg_c, media_tiempo_age_c, media_tiempo_BL_mejora_c]
             })
         else:
             # Crear un nuevo DataFrame para mostrar los resultados
             resultados_globales_c = pd.DataFrame({
-                'Algoritmo': ['BL', 'Greedy', 'Agg'],
-                'Fitness': [media_BL_c, media_Greedy_c, media_agg_c],
-                'Tiempo': [media_tiempo_BL_c, media_tiempo_Greedy_c, media_tiempo_agg_c]
+                'Algoritmo': ['BL', 'Greedy', 'Agg', 'Age'],
+                'Fitness': [media_BL_c, media_Greedy_c, media_agg_c, media_age_c],
+                'Tiempo': [media_tiempo_BL_c, media_tiempo_Greedy_c, media_tiempo_agg_c, media_tiempo_age_c]
             })
 
         # Si es necesario, ordena la tabla por la columna 'Fitness'
@@ -251,8 +269,9 @@ def main():
         barras_bl = plt.bar(indices, tabla['Bondad BL'], bar_width, label='Bondad BL', alpha=0.8)
         barras_greedy = plt.bar(indices + bar_width, tabla['Bondad Greedy'], bar_width, label='Bondad Greedy', alpha=0.8)
         barras_agg = plt.bar(indices + bar_width*2, tabla['Bondad agg'], bar_width, label='Bondad agg', alpha=0.8)
+        barras_age = plt.bar(indices + bar_width*3, tabla['Bondad age'], bar_width, label='Bondad age', alpha=0.8)
         if conf.MEJORA_BL:
-            barras_bl_mejora = plt.bar(indices + bar_width * 3, tabla['Bondad BL+'], bar_width, label='Bondad BL+', alpha=0.8)
+            barras_bl_mejora = plt.bar(indices + bar_width * 4, tabla['Bondad BL+'], bar_width, label='Bondad BL+', alpha=0.8)
 
         # Añadir títulos y etiquetas
         plt.xlabel('Nombre del problema')
@@ -285,8 +304,9 @@ def main():
         barras_bl = plt.bar(indices, tabla['Tiempo BL'], bar_width, label='Tiempo BL', alpha=0.8)
         barras_greedy = plt.bar(indices + bar_width, tabla['Tiempo Greedy'], bar_width, label='Tiempo Greedy', alpha=0.8)
         barras_agg = plt.bar(indices + bar_width*2, tabla['Tiempo agg'], bar_width, label='Tiempo agg', alpha=0.8)
+        barras_age = plt.bar(indices + bar_width*3, tabla['Tiempo age'], bar_width, label='Tiempo age', alpha=0.8)
         if conf.MEJORA_BL:
-            barras_bl_mejora = plt.bar(indices + bar_width*3, tabla['Tiempo BL+'], bar_width, label='Tiempo BL+', alpha=0.8)
+            barras_bl_mejora = plt.bar(indices + bar_width*4, tabla['Tiempo BL+'], bar_width, label='Tiempo BL+', alpha=0.8)
 
         # Añadir títulos y etiquetas
         plt.xlabel('Nombre del problema')
