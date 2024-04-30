@@ -161,13 +161,18 @@ class Problema:
         return solucion_calculada
 
     #toma como la sulucion en la que buscara su entorno la solucion_actual    
-    def primer_mejor_vecino(self, N, vecindario = 0) -> bool: #vecindario 0 (vecindario pequeño)
+    def primer_mejor_vecino(self, N, vecindario = 0, lim = 0) -> bool: #vecindario 0 (vecindario pequeño)
        #en esta busqueda de entorno solo se generan permutaciones de objetos (es decir no aumenta el numero de objetos elegedio en la solucion inicial)
         v = Vecindarios(self.solucion_actual.solucion,vecindario)
 
         solucion_a_explorar, permutacion = v.siguiente_vecino()
 
-        while (not np.array_equal(solucion_a_explorar, self.solucion_actual.solucion) and N[0] < conf.MAX_EVALUACIONES):
+        if lim == 0:
+            limite = conf.MAX_EVALUACIONES
+        else:
+            limite = self.solucion_actual.solucion.shape[0]
+
+        while (not np.array_equal(solucion_a_explorar, self.solucion_actual.solucion) and N[0] < limite):
 
             if self.factible(solucion_a_explorar):
                 solucion_a_explorar_calc = self.factorizacion(solucion_a_explorar,permutacion)
@@ -335,6 +340,19 @@ def greedy(matriz_valor, peso_max, vector_pesos) -> Solucion:
 #    / /\ \| | |_ | | |_ |
 #   / ____ \ |__| | |__| |
 #  /_/    \_\_____|\_____|
+def BL_primer_mejor_meme(matriz_valor, peso_max, vector_pesos, solucion, N, vecindario = 0) -> Solucion:
+    prob = Problema(matriz_valor, peso_max, vector_pesos)
+
+    prob.solucion_actual.solucion = solucion.solucion.copy()
+    prob.solucion_actual.beneficio = solucion.beneficio
+    prob.solucion_actual.peso = solucion.peso
+
+    mejora = prob.primer_mejor_vecino(N, lim =1)
+    while mejora:
+        mejora = prob.primer_mejor_vecino(N, lim = 1)
+
+    return prob.solucion_actual
+
 
 def torneo_binario(pop):
     #indices random
@@ -366,11 +384,13 @@ def peor_de_pop(pop):
             peor = indi
     return peor
 
-def agg(matriz_valor, peso_max, vector_pesos, cruce = 0) -> Solucion:
+def agg(matriz_valor, peso_max, vector_pesos, cruce = 0, meme = 0) -> Solucion:
     p = Problema(matriz_valor, peso_max, vector_pesos)
     pop = p.poblacion_inicial()
     newpop = pop.copy()
     evaluadas = len(pop)
+
+    generacion = 1
 
     mejor = mejor_de_pop(pop)
 
@@ -413,7 +433,30 @@ def agg(matriz_valor, peso_max, vector_pesos, cruce = 0) -> Solucion:
 
         #Remplazo
         pop = newpop.copy()
-    
+
+        generacion +=1
+
+        if meme != 0 and generacion % 10 == 0:
+            if meme == 1:
+                for cromosoma in pop:
+                    N = [1]
+                    cromosoma = BL_primer_mejor_meme(matriz_valor, peso_max, vector_pesos, cromosoma, N)
+                    evaluadas += N[0]
+            elif meme == 2:
+                cromosomas_BL = conf.POBLACION * conf.PROBABILIDAD_MEME2
+                for i in range(0, int(cromosomas_BL)):
+                    cromosoma = torneo_binario(pop)
+                    N = [1]
+                    cromosoma = BL_primer_mejor_meme(matriz_valor, peso_max, vector_pesos, cromosoma, N)
+                    evaluadas += N[0]
+            elif meme == 3:
+                pop = sorted(pop, key=lambda x : x.beneficio)
+                cromosomas_BL = conf.POBLACION * conf.PROBABILIDAD_MEME2
+                for i in range(0, int(cromosomas_BL)):
+                    N = [1]
+                    pop[i] = BL_primer_mejor_meme(matriz_valor, peso_max, vector_pesos, pop[i], N)
+                    evaluadas += N[0]
+
     return mejor_de_pop(pop)
 
 #            _____ ______ 
