@@ -120,6 +120,9 @@ class Problema:
         self.solucion_actual.solucion = np.zeros(vector_pesos.shape[0])
         self.solucion_actual.peso = peso_max
         self.solucion_actual.beneficio = 0
+
+        densidades = np.diag(matriz_valor) / vector_pesos
+        self.indices_por_densidad = np.argsort(densidades)[::-1]
     
     #da una solucion inicial aleatoria 
     def solucion_inicial(self) -> Solucion:
@@ -202,10 +205,13 @@ class Problema:
         indices_cruce = np.random.randint(0,padre1.shape[0], size=2)
         hijo1 = padre1.copy()
         hijo2 = padre2.copy()
+        
+        hijo1[indices_cruce.min():indices_cruce.max() + 1] = padre2[indices_cruce.min():indices_cruce.max() + 1].copy()
+        hijo2[indices_cruce.min():indices_cruce.max() + 1] = padre1[indices_cruce.min():indices_cruce.max() + 1].copy()
 
-        for i in range(indices_cruce.min(), indices_cruce.max() + 1):
-            hijo1[i] = padre2[i]
-            hijo2[i] = padre1[i]
+        # for i in range(indices_cruce.min(), indices_cruce.max() + 1):
+        #      hijo1[i] = padre2[i]
+        #      hijo2[i] = padre1[i]
 
         if not self.factible(hijo1):
             indices_1_hijo1 = np.where(hijo1 == 1)[0]
@@ -229,6 +235,58 @@ class Problema:
         hijo2 = self.calculo_solucion(hijo2)
         return (hijo1, hijo2)
     
+    def cruce_propuesto1(self, padre1, padre2) -> tuple:
+        hijo1 = padre1.copy()
+        hijo2 = padre2.copy()
+
+        for i in self.indices_por_densidad:
+            if padre2[i] == 1 and padre1[i] == 0:
+                hijo1[i] = 1
+                if not self.factible(hijo1):
+                    hijo1[i] = 0
+            if padre1[i] == 1 and padre2[i] == 0:
+                hijo2[i] = 1
+                if not self.factible(hijo2):
+                    hijo2[i] = 0
+
+        hijo1 = self.calculo_solucion(hijo1)
+        hijo2 = self.calculo_solucion(hijo2)
+        return (hijo1, hijo2)
+    
+    def cruce_propuesto2(self, padre1, padre2) -> tuple:
+        indices_cruce = np.random.randint(0,padre1.shape[0]-1, size=2)
+        hijo1 = np.zeros(padre1.shape[0], dtype=int)
+        hijo2 = np.zeros(padre1.shape[0], dtype=int)
+        densidades = np.zeros(indices_cruce.max() - indices_cruce.min() + 1)
+
+        hijo1[0:indices_cruce.min()+1] = padre1[0:indices_cruce.min()+1].copy()
+        hijo2[0:indices_cruce.min()+1] = padre2[0:indices_cruce.min()+1].copy()
+
+        hijo1[indices_cruce.max():padre1.shape[0]] = padre1[indices_cruce.max():padre1.shape[0]].copy()
+        hijo2[indices_cruce.max():padre1.shape[0]] = padre2[indices_cruce.max():padre1.shape[0]].copy()
+        
+        ind_densidad = 0
+        for i in range(indices_cruce.min(), indices_cruce.max()+1):
+            densidades[ind_densidad] = self.matriz_valor[i][i] / self.vector_pesos[i]
+            ind_densidad += 1
+        
+        vector_indices_ordenados_densidad = np.argsort(densidades)[::-1]
+
+        for i in vector_indices_ordenados_densidad:
+            if padre2[i] == 1:
+                hijo1[i] = 1
+                if not self.factible(hijo1):
+                    hijo1[i] = 0
+            if padre1[i] == 1:
+                hijo2[i] = 1
+                if not self.factible(hijo2):
+                    hijo2[i] = 0
+
+        hijo1 = self.calculo_solucion(hijo1)
+        hijo2 = self.calculo_solucion(hijo2)
+        return (hijo1, hijo2)
+    
+
     def mutacion(self, sol) -> Solucion:
         mutada = sol.copy()
         m = 0
@@ -406,9 +464,14 @@ def agg(matriz_valor, peso_max, vector_pesos, cruce = 0, meme = 0) -> Solucion:
 
         i = 0
         while i < total_cruces:
-            p1 = pop[i]
-            p2 = pop[i+1]
-            h1, h2 = p.cruce_intercambio_puntos(p1.solucion,p2.solucion)
+            padre1 = pop[i]
+            padre2 = pop[i+1]
+            
+            if cruce == 0:
+                h1, h2 = p.cruce_intercambio_puntos(padre1.solucion,padre2.solucion)
+            elif cruce == 1:
+                h1, h2 = p.cruce_propuesto1(padre1.solucion,padre2.solucion)
+
             newpop[i] = h1
             newpop[i+1] = h2
             i += 2
@@ -517,7 +580,10 @@ def age(matriz_valor, peso_max, vector_pesos, cruce = 0) -> Solucion:
         padre2 = torneo_binario(pop)
 
         #cruce
-        h1, h2 = p.cruce_intercambio_puntos(padre1.solucion,padre2.solucion)
+        if cruce == 0:
+            h1, h2 = p.cruce_intercambio_puntos(padre1.solucion,padre2.solucion)
+        elif cruce == 1:
+            h1, h2 = p.cruce_propuesto1(padre1.solucion,padre2.solucion)
 
         #mutacion
         if conf.PROBABILIDAD_CRUZE >= np.random.rand():
