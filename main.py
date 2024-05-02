@@ -107,67 +107,74 @@ def main():
                     print("Greedy -> ({}) Con un peso disponible de: {}    y bondad total de: {} ||T {}".format(ruta_archivo, peso_maximo - sol.peso ,sol.beneficio, duracion_Greedy))
                     print('')
 
+                np.random.seed(conf.SEMILLA)
                 inicio = time.time()
-                sol_agg = alg.agg(matriz_valores, peso_maximo, vector_pesos)
+                sol_agg, eva_agg, _ = alg.agg(matriz_valores, peso_maximo, vector_pesos)
                 fin = time.time()
                 duracion_agg = fin - inicio
                 if conf.MOSTRAR_CADA_SALIDA:
                     print(sol_agg.solucion.astype(int))
-                    print("Agg -> ({}) Con un peso disponible de: {}    y bondad total de: {} ||T {}".format(ruta_archivo, peso_maximo - sol_agg.peso ,sol_agg.beneficio, duracion_agg))
+                    print("Agg -> ({}) Con un peso disponible de: {}    y bondad total de: {} ||T {} || evaluaciones: {}".format(ruta_archivo, peso_maximo - sol_agg.peso ,sol_agg.beneficio, duracion_agg, eva_agg))
                     print('')
 
+                np.random.seed(conf.SEMILLA)
                 inicio = time.time()
-                sol_agg_1 = alg.agg(matriz_valores, peso_maximo, vector_pesos,cruce=1)
+                sol_agg_1, eva_agg_1, _ = alg.agg(matriz_valores, peso_maximo, vector_pesos,cruce=1)
                 fin = time.time()
                 duracion_agg_1 = fin - inicio
                 if conf.MOSTRAR_CADA_SALIDA:
                     print(sol_agg_1.solucion.astype(int))
-                    print("Agg_1 -> ({}) Con un peso disponible de: {}    y bondad total de: {} ||T {}".format(ruta_archivo, peso_maximo - sol_agg_1.peso ,sol_agg_1.beneficio, duracion_agg_1))
+                    print("Agg_1 -> ({}) Con un peso disponible de: {}    y bondad total de: {} ||T {} || evaluaciones: {}".format(ruta_archivo, peso_maximo - sol_agg_1.peso ,sol_agg_1.beneficio, duracion_agg_1, eva_agg_1))
                     print('')
 
+                np.random.seed(conf.SEMILLA)
                 inicio = time.time()
-                sol_age = alg.age(matriz_valores, peso_maximo, vector_pesos)
+                sol_age, eva_age = alg.age(matriz_valores, peso_maximo, vector_pesos)
                 fin = time.time()
                 duracion_age = fin - inicio
                 if conf.MOSTRAR_CADA_SALIDA:
                     print(sol_age.solucion.astype(int))
-                    print("Age -> ({}) Con un peso disponible de: {}    y bondad total de: {} ||T {}".format(ruta_archivo, peso_maximo - sol_age.peso ,sol_age.beneficio, duracion_age))
+                    print("Age -> ({}) Con un peso disponible de: {}    y bondad total de: {} ||T {} || evaluaciones: {}".format(ruta_archivo, peso_maximo - sol_age.peso ,sol_age.beneficio, duracion_age, eva_age))
                     print('')
 
+                np.random.seed(conf.SEMILLA)
                 inicio = time.time()
-                sol_age_1 = alg.age(matriz_valores, peso_maximo, vector_pesos,cruce=1)
+                sol_age_1, eva_age_1 = alg.age(matriz_valores, peso_maximo, vector_pesos,cruce=1)
                 fin = time.time()
                 duracion_age_1 = fin - inicio
                 if conf.MOSTRAR_CADA_SALIDA:
                     print(sol_age_1.solucion.astype(int))
-                    print("Age_1 -> ({}) Con un peso disponible de: {}    y bondad total de: {} ||T {}".format(ruta_archivo, peso_maximo - sol_age_1.peso ,sol_age_1.beneficio, duracion_age_1))
+                    print("Age_1 -> ({}) Con un peso disponible de: {}    y bondad total de: {} ||T {} || evaluaciones: {}".format(ruta_archivo, peso_maximo - sol_age_1.peso ,sol_age_1.beneficio, duracion_age_1, eva_age_1))
                     print('')
 
+                np.random.seed(conf.SEMILLA)
                 inicio = time.time()
-                sol_am1 = alg.agg(matriz_valores, peso_maximo, vector_pesos, meme=1)
+                sol_am1, eva_am1, bl_am1 = alg.agg(matriz_valores, peso_maximo, vector_pesos, meme=1)
                 fin = time.time()
                 duracion_am1 = fin - inicio
                 if conf.MOSTRAR_CADA_SALIDA:
-                    print(sol.solucion.astype(int))
-                    print("Am1 -> ({}) Con un peso disponible de: {}    y bondad total de: {} ||T {}".format(ruta_archivo, peso_maximo - sol_am1.peso ,sol_am1.beneficio, duracion_am1))
+                    print(sol_am1.solucion.astype(int))
+                    print("Am1 -> ({}) Con un peso disponible de: {}    y bondad total de: {} ||T {} || evaluaciones P: {};  evaluaciones bl: {}".format(ruta_archivo, peso_maximo - sol_am1.peso ,sol_am1.beneficio, duracion_am1, eva_am1-bl_am1, bl_am1))
                     print('')
 
+                np.random.seed(conf.SEMILLA)
                 inicio = time.time()
-                sol_am2 = alg.agg(matriz_valores, peso_maximo, vector_pesos, meme=2)
+                sol_am2, eva_am2, bl_am2 = alg.agg(matriz_valores, peso_maximo, vector_pesos, meme=2)
                 fin = time.time()
                 duracion_am2 = fin - inicio
                 if conf.MOSTRAR_CADA_SALIDA:
-                    print(sol.solucion.astype(int))
-                    print("Am2 -> ({}) Con un peso disponible de: {}    y bondad total de: {} ||T {}".format(ruta_archivo, peso_maximo - sol_am2.peso ,sol_am2.beneficio, duracion_am2))
+                    print(sol_am2.solucion.astype(int))
+                    print("Am2 -> ({}) Con un peso disponible de: {}    y bondad total de: {} ||T {} || evaluaciones P: {};  evaluaciones bl: {}".format(ruta_archivo, peso_maximo - sol_am2.peso ,sol_am2.beneficio, duracion_am2, eva_am2-bl_am2, bl_am2))
                     print('')
 
+                np.random.seed(conf.SEMILLA)
                 inicio = time.time()
-                sol_am3 = alg.agg(matriz_valores, peso_maximo, vector_pesos, meme=3)
+                sol_am3, eva_am3, bl_am3 = alg.agg(matriz_valores, peso_maximo, vector_pesos, meme=3)
                 fin = time.time()
                 duracion_am3 = fin - inicio
                 if conf.MOSTRAR_CADA_SALIDA:
-                    print(sol.solucion.astype(int))
-                    print("Am3 -> ({}) Con un peso disponible de: {}    y bondad total de: {} ||T {}".format(ruta_archivo, peso_maximo - sol_am3.peso ,sol_am3.beneficio, duracion_am3))
+                    print(sol_am3.solucion.astype(int))
+                    print("Am3 -> ({}) Con un peso disponible de: {}    y bondad total de: {} ||T {} || evaluaciones P: {};  evaluaciones bl: {}".format(ruta_archivo, peso_maximo - sol_am3.peso ,sol_am3.beneficio, duracion_am3, eva_am3-bl_am3, bl_am3))
                     print('')
 
                 if conf.MEJORA_BL:

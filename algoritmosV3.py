@@ -173,7 +173,7 @@ class Problema:
         if lim == 0:
             limite = conf.MAX_EVALUACIONES
         else:
-            limite = self.solucion_actual.solucion.shape[0]
+            limite = lim
 
         while (not np.array_equal(solucion_a_explorar, self.solucion_actual.solucion) and N[0] < limite):
 
@@ -208,10 +208,6 @@ class Problema:
         
         hijo1[indices_cruce.min():indices_cruce.max() + 1] = padre2[indices_cruce.min():indices_cruce.max() + 1].copy()
         hijo2[indices_cruce.min():indices_cruce.max() + 1] = padre1[indices_cruce.min():indices_cruce.max() + 1].copy()
-
-        # for i in range(indices_cruce.min(), indices_cruce.max() + 1):
-        #      hijo1[i] = padre2[i]
-        #      hijo2[i] = padre1[i]
 
         if not self.factible(hijo1):
             indices_1_hijo1 = np.where(hijo1 == 1)[0]
@@ -398,16 +394,17 @@ def greedy(matriz_valor, peso_max, vector_pesos) -> Solucion:
 #    / /\ \| | |_ | | |_ |
 #   / ____ \ |__| | |__| |
 #  /_/    \_\_____|\_____|
-def BL_primer_mejor_meme(matriz_valor, peso_max, vector_pesos, solucion, N, vecindario = 0) -> Solucion:
+
+def BL_primer_mejor_meme(matriz_valor, peso_max, vector_pesos, solucion, N, lim) -> Solucion:
     prob = Problema(matriz_valor, peso_max, vector_pesos)
 
     prob.solucion_actual.solucion = solucion.solucion.copy()
     prob.solucion_actual.beneficio = solucion.beneficio
     prob.solucion_actual.peso = solucion.peso
 
-    mejora = prob.primer_mejor_vecino(N, lim =1)
+    mejora = prob.primer_mejor_vecino(N, lim = lim)
     while mejora:
-        mejora = prob.primer_mejor_vecino(N, lim = 1)
+        mejora = prob.primer_mejor_vecino(N, lim = lim)
 
     return prob.solucion_actual
 
@@ -447,6 +444,7 @@ def agg(matriz_valor, peso_max, vector_pesos, cruce = 0, meme = 0) -> Solucion:
     pop = p.poblacion_inicial()
     newpop = pop.copy()
     evaluadas = len(pop)
+    eva_bl = 0
 
     generacion = 1
 
@@ -485,6 +483,52 @@ def agg(matriz_valor, peso_max, vector_pesos, cruce = 0, meme = 0) -> Solucion:
             newpop[posi] = p.mutacion(pop[posi].solucion)
             evaluadas += 1
 
+        if meme != 0 and generacion % 10 == 0:  #mover antes de incluso el elitismo-----------________________------------___________
+            if meme == 1:
+                for cromosoma in newpop:
+                    if evaluadas >= conf.MAX_EVALUACIONES:
+                        break
+                    elif conf.MAX_EVALUACIONES - evaluadas < cromosoma.solucion.shape[0]:
+                        lim = conf.MAX_EVALUACIONES - evaluadas
+                    else:
+                        lim = cromosoma.solucion.shape[0]
+
+                    N = [1]
+                    cromosoma = BL_primer_mejor_meme(matriz_valor, peso_max, vector_pesos, cromosoma, N, lim)
+                    evaluadas += N[0]
+                    eva_bl += N[0]
+            elif meme == 2:
+                cromosomas_BL = conf.POBLACION * conf.PROBABILIDAD_MEME2
+                for i in range(0, int(cromosomas_BL)):
+                    cromosoma = newpop[np.random.randint(0, conf.POBLACION)]
+                    if evaluadas >= conf.MAX_EVALUACIONES:
+                        break
+                    elif conf.MAX_EVALUACIONES - evaluadas < cromosoma.solucion.shape[0]:
+                        lim = conf.MAX_EVALUACIONES - evaluadas
+                    else:
+                        lim = cromosoma.solucion.shape[0]
+    
+                    N = [1]
+                    cromosoma = BL_primer_mejor_meme(matriz_valor, peso_max, vector_pesos, cromosoma, N, lim)
+                    evaluadas += N[0]
+                    eva_bl += N[0]
+            elif meme == 3:
+                newpop = sorted(newpop, key=lambda x : x.beneficio)[::-1]
+                cromosomas_BL = conf.POBLACION * conf.PROBABILIDAD_MEME2
+                for i in range(0, int(cromosomas_BL)):
+                    if evaluadas >= conf.MAX_EVALUACIONES:
+                        break
+                    elif conf.MAX_EVALUACIONES - evaluadas < newpop[0].solucion.shape[0]:
+                        lim = conf.MAX_EVALUACIONES - evaluadas
+                    else:
+                        lim = newpop[0].solucion.shape[0]
+
+                    N = [1]
+                    newpop[i] = BL_primer_mejor_meme(matriz_valor, peso_max, vector_pesos, newpop[i], N, lim)
+                    evaluadas += N[0]
+                    eva_bl += N[0]
+
+        #rescata mejor
         mejor_new = mejor_de_pop(newpop)
         
         if mejor.beneficio > mejor_new.beneficio:
@@ -499,28 +543,7 @@ def agg(matriz_valor, peso_max, vector_pesos, cruce = 0, meme = 0) -> Solucion:
 
         generacion +=1
 
-        if meme != 0 and generacion % 10 == 0:
-            if meme == 1:
-                for cromosoma in pop:
-                    N = [1]
-                    cromosoma = BL_primer_mejor_meme(matriz_valor, peso_max, vector_pesos, cromosoma, N)
-                    evaluadas += N[0]
-            elif meme == 2:
-                cromosomas_BL = conf.POBLACION * conf.PROBABILIDAD_MEME2
-                for i in range(0, int(cromosomas_BL)):
-                    cromosoma = torneo_binario(pop)
-                    N = [1]
-                    cromosoma = BL_primer_mejor_meme(matriz_valor, peso_max, vector_pesos, cromosoma, N)
-                    evaluadas += N[0]
-            elif meme == 3:
-                pop = sorted(pop, key=lambda x : x.beneficio)
-                cromosomas_BL = conf.POBLACION * conf.PROBABILIDAD_MEME2
-                for i in range(0, int(cromosomas_BL)):
-                    N = [1]
-                    pop[i] = BL_primer_mejor_meme(matriz_valor, peso_max, vector_pesos, pop[i], N)
-                    evaluadas += N[0]
-
-    return mejor_de_pop(pop)
+    return (mejor_de_pop(pop), evaluadas, eva_bl)
 
 #            _____ ______ 
 #      /\   / ____|  ____|
@@ -597,5 +620,5 @@ def age(matriz_valor, peso_max, vector_pesos, cruce = 0) -> Solucion:
         #Remplaza los dos peores
         ramplazar_peores(pop, h1, h2)
 
-    return mejor_de_pop(pop)
+    return (mejor_de_pop(pop), evaluadas)
 
