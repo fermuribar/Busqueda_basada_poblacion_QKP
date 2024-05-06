@@ -409,17 +409,23 @@ def BL_primer_mejor_meme(matriz_valor, peso_max, vector_pesos, solucion, N, lim)
     return prob.solucion_actual
 
 
-def torneo_binario(pop):
+def torneo_de_tres(pop):
     #indices random
     pos1 = np.random.randint(0, conf.POBLACION)
     pos2 = np.random.randint(0, conf.POBLACION)
+    pos3 = np.random.randint(0, conf.POBLACION)
 
     #asegura que son distintos
-    while pos2 == pos1:
+    while pos2 == pos1 or pos2 == pos3:
         pos2 = np.random.randint(0, conf.POBLACION)
 
-    if pop[pos1].beneficio < pop[pos2].beneficio:
+    while pos3 == pos1 or pos3 == pos2:
+        pos3 = np.random.randint(0, conf.POBLACION)
+
+    if pop[pos1].beneficio < pop[pos2].beneficio and pop[pos3].beneficio < pop[pos2].beneficio:
         return pop[pos2]
+    elif pop[pos1].beneficio < pop[pos3].beneficio and pop[pos2].beneficio < pop[pos3].beneficio:
+        return pop[pos3]
     else:
         return pop[pos1]
     
@@ -442,19 +448,20 @@ def peor_de_pop(pop):
 def agg(matriz_valor, peso_max, vector_pesos, cruce = 0, meme = 0) -> Solucion:
     p = Problema(matriz_valor, peso_max, vector_pesos)
     pop = p.poblacion_inicial()
+    beneficios = np.array([indi.beneficio for indi in pop])
     newpop = pop.copy()
     evaluadas = len(pop)
     eva_bl = 0
 
     generacion = 1
 
-    mejor = mejor_de_pop(pop)
+    mejor = pop[np.argmax(beneficios)]
 
     while evaluadas < conf.MAX_EVALUACIONES:
         #seleccion
         for i in newpop:
             #Copia el ganador del torneo
-            ganador = torneo_binario(pop)
+            ganador = torneo_de_tres(pop)
             i = ganador
 
         #numero de cruces
@@ -530,11 +537,13 @@ def agg(matriz_valor, peso_max, vector_pesos, cruce = 0, meme = 0) -> Solucion:
                     evaluadas += N[0]
                     eva_bl += N[0]
 
+        beneficios = np.array([indi.beneficio for indi in newpop]) #mejorable
+
         #rescata mejor
-        mejor_new = mejor_de_pop(newpop)
+        mejor_new = newpop[np.argmax(beneficios)]
         
         if mejor.beneficio > mejor_new.beneficio:
-            peor = peor_de_pop(newpop)
+            peor = newpop[np.argmin(beneficios)]
             peor.solucion = mejor.solucion.copy()
             peor.beneficio = mejor.beneficio
         else:
@@ -556,53 +565,43 @@ def agg(matriz_valor, peso_max, vector_pesos, cruce = 0, meme = 0) -> Solucion:
 
 def ramplazar_peores(pop, h1, h2):
     sw = False
+    beneficios = np.array([indi.beneficio for indi in pop])
+    ind_orden = np.argsort(beneficios)
+
     if h1.beneficio > h2.beneficio:
-        if h1.beneficio > pop[-2].beneficio:
-            pop[-1] = h1
-            if h2.beneficio > pop[-1].beneficio:
-                pop[-2] = h2
+        if h1.beneficio > pop[ind_orden[2]].beneficio:
+            pop[ind_orden[1]] = h1
+            if h2.beneficio > pop[ind_orden[1]].beneficio:
+                pop[ind_orden[2]] = h2
             sw = True
         else:
             if h1.beneficio > pop[-1].beneficio:
-                pop[-2] = h1
+                pop[ind_orden[2]] = h1
                 sw = True
     else:
-        if h2.beneficio > pop[-2].beneficio:
-            pop[-2] = h2
-            if h1.beneficio > pop[-1].beneficio:
-                pop[-1] = h1
+        if h2.beneficio > pop[ind_orden[2]].beneficio:
+            pop[ind_orden[2]] = h2
+            if h1.beneficio > pop[ind_orden[1]].beneficio:
+                pop[ind_orden[1]] = h1
             sw = True
         else:
-            if h2.beneficio > pop[-1].beneficio:
-                pop[-1] = h2
+            if h2.beneficio > pop[ind_orden[1]].beneficio:
+                pop[ind_orden[1]] = h2
                 sw = True
 
-        if sw:
-            #pop = sorted(pop, key=lambda x: x.beneficio)
-            for i in range(0,2):
-                i = conf.POBLACION - 1
-                while i > 0:
-                    if pop[i].beneficio > pop[i-1].beneficio:
-                        aux = pop[i]
-                        pop[i] = pop[i-1]
-                        pop[i-1] = aux
-                    else:
-                        break
-                    i -= 1
 
 
 
 def age(matriz_valor, peso_max, vector_pesos, cruce = 0) -> Solucion:
     p = Problema(matriz_valor, peso_max, vector_pesos)
     pop = p.poblacion_inicial()
-    newpop = pop.copy()
     evaluadas = conf.POBLACION
     pop = sorted(pop, key=lambda x: x.beneficio)
 
     while evaluadas < conf.MAX_EVALUACIONES:
         #Seleccion por torneo
-        padre1 = torneo_binario(pop)
-        padre2 = torneo_binario(pop)
+        padre1 = torneo_de_tres(pop)
+        padre2 = torneo_de_tres(pop)
 
         #cruce
         if cruce == 0:
@@ -611,10 +610,10 @@ def age(matriz_valor, peso_max, vector_pesos, cruce = 0) -> Solucion:
             h1, h2 = p.cruce_propuesto1(padre1.solucion,padre2.solucion)
 
         #mutacion
-        if conf.PROBABILIDAD_CRUZE >= np.random.rand():
+        if conf.PROBABILIDAD_MUTACION >= np.random.rand():
             h1 = p.mutacion(h1.solucion)
 
-        if conf.PROBABILIDAD_CRUZE >= np.random.rand():
+        if conf.PROBABILIDAD_MUTACION >= np.random.rand():
             h2 = p.mutacion(h2.solucion)
         
         evaluadas += 2
