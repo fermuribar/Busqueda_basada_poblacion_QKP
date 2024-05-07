@@ -25,6 +25,20 @@ def main():
         solucion = alg.BL_primer_mejor(matriz_valores,peso_maximo,vector_pesos)
         np.random.seed(conf.SEMILLA)
         solucion_mejora = alg.BL_primer_mejor(matriz_valores,peso_maximo,vector_pesos, vecindario = 1)
+        np.random.seed(conf.SEMILLA)
+        sol_agg, eva_agg, _ = alg.agg(matriz_valores, peso_maximo, vector_pesos)
+        np.random.seed(conf.SEMILLA)
+        sol_agg_1, eva_agg_1, _ = alg.agg(matriz_valores, peso_maximo, vector_pesos,cruce=1)
+        np.random.seed(conf.SEMILLA)
+        sol_age, eva_age = alg.age(matriz_valores, peso_maximo, vector_pesos)
+        np.random.seed(conf.SEMILLA)
+        sol_age_1, eva_age_1 = alg.age(matriz_valores, peso_maximo, vector_pesos,cruce=1)
+        np.random.seed(conf.SEMILLA)
+        sol_am1, eva_am1, bl_am1 = alg.agg(matriz_valores, peso_maximo, vector_pesos, meme=1)
+        np.random.seed(conf.SEMILLA)
+        sol_am2, eva_am2, bl_am2 = alg.agg(matriz_valores, peso_maximo, vector_pesos, meme=2)
+        np.random.seed(conf.SEMILLA)
+        sol_am3, eva_am3, bl_am3 = alg.agg(matriz_valores, peso_maximo, vector_pesos, meme=3)
         return
 
     # Crear un DataFrame vacío con las columnas específicas

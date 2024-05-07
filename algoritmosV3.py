@@ -250,34 +250,31 @@ class Problema:
         return (hijo1, hijo2)
     
     def cruce_propuesto2(self, padre1, padre2) -> tuple:
-        indices_cruce = np.random.randint(0,padre1.shape[0]-1, size=2)
-        hijo1 = np.zeros(padre1.shape[0], dtype=int)
-        hijo2 = np.zeros(padre1.shape[0], dtype=int)
-        densidades = np.zeros(indices_cruce.max() - indices_cruce.min() + 1)
-
-        hijo1[0:indices_cruce.min()+1] = padre1[0:indices_cruce.min()+1].copy()
-        hijo2[0:indices_cruce.min()+1] = padre2[0:indices_cruce.min()+1].copy()
-
-        hijo1[indices_cruce.max():padre1.shape[0]] = padre1[indices_cruce.max():padre1.shape[0]].copy()
-        hijo2[indices_cruce.max():padre1.shape[0]] = padre2[indices_cruce.max():padre1.shape[0]].copy()
+        indices_cruce = np.random.randint(0,padre1.shape[0], size=2)
+        hijo1 = padre1.copy()
+        hijo2 = padre2.copy()
         
-        ind_densidad = 0
-        for i in range(indices_cruce.min(), indices_cruce.max()+1):
-            densidades[ind_densidad] = self.matriz_valor[i][i] / self.vector_pesos[i]
-            ind_densidad += 1
+        hijo1[indices_cruce.min():indices_cruce.max() + 1] = padre2[indices_cruce.min():indices_cruce.max() + 1].copy()
+        hijo2[indices_cruce.min():indices_cruce.max() + 1] = padre1[indices_cruce.min():indices_cruce.max() + 1].copy()
+
+        if not self.factible(hijo1):
+            indices_1_hijo1 = np.where(hijo1 == 1)[0]
+            beneficios_hijo1 = self.indices_por_densidad[np.isin(self.indices_por_densidad,indices_1_hijo1)][::-1]
+
+        h = 0
+        while not self.factible(hijo1):
+            hijo1[beneficios_hijo1[h]] = 0
+            h += 1
+
+        if not self.factible(hijo2):
+            indices_1_hijo2 = np.where(hijo2 == 1)[0]
+            beneficios_hijo2 = self.indices_por_densidad[np.isin(self.indices_por_densidad,indices_1_hijo2)][::-1]
+
+        h = 0
+        while not self.factible(hijo2):
+            hijo2[beneficios_hijo2[h]] = 0
+            h += 1
         
-        vector_indices_ordenados_densidad = np.argsort(densidades)[::-1]
-
-        for i in vector_indices_ordenados_densidad:
-            if padre2[i] == 1:
-                hijo1[i] = 1
-                if not self.factible(hijo1):
-                    hijo1[i] = 0
-            if padre1[i] == 1:
-                hijo2[i] = 1
-                if not self.factible(hijo2):
-                    hijo2[i] = 0
-
         hijo1 = self.calculo_solucion(hijo1)
         hijo2 = self.calculo_solucion(hijo2)
         return (hijo1, hijo2)
@@ -341,7 +338,10 @@ def BL_primer_mejor(matriz_valor, peso_max, vector_pesos, vecindario = 0) -> Sol
 
         plt.xlabel('Iteraciones')
         plt.ylabel('Beneficio')
-        plt.title('Evolución del Beneficio en BL')
+        if vecindario == 1:
+            plt.title('Evolución del Beneficio en BL+')
+        else:
+            plt.title('Evolución del Beneficio en BL')
         plt.show()
     return prob.solucion_actual
 
@@ -430,20 +430,14 @@ def torneo_de_tres(pop):
         return pop[pos1]
     
 def mejor_de_pop(pop):
-    mejor = Solucion()
-    mejor.beneficio = 0
-    for indi in pop:
-        if indi.beneficio > mejor.beneficio:
-            mejor = indi
-    return mejor
+    beneficios = np.array([indi.beneficio for indi in pop])
+    ind_orden = np.argsort(beneficios)[::-1]
+    return pop[ind_orden[0]]
 
-def peor_de_pop(pop):
-    peor = Solucion()
-    peor.beneficio = 1_000_000_000
-    for indi in pop:
-        if indi.beneficio < peor.beneficio:
-            peor = indi
-    return peor
+def peor_de_pop(pop):       #no se usa
+    beneficios = np.array([indi.beneficio for indi in pop])
+    ind_orden = np.argsort(beneficios)
+    return pop[ind_orden[0]]
 
 def agg(matriz_valor, peso_max, vector_pesos, cruce = 0, meme = 0) -> Solucion:
     p = Problema(matriz_valor, peso_max, vector_pesos)
@@ -452,10 +446,13 @@ def agg(matriz_valor, peso_max, vector_pesos, cruce = 0, meme = 0) -> Solucion:
     newpop = pop.copy()
     evaluadas = len(pop)
     eva_bl = 0
-
+    
     generacion = 1
 
     mejor = pop[np.argmax(beneficios)]
+    if conf.VER_GRAFICA_DE_MEJORA_SOLO_PARA_UN_PROBLEMA:
+        historial = []
+        historial.append(mejor.beneficio)
 
     while evaluadas < conf.MAX_EVALUACIONES:
         #seleccion
@@ -549,10 +546,30 @@ def agg(matriz_valor, peso_max, vector_pesos, cruce = 0, meme = 0) -> Solucion:
         else:
             mejor = mejor_new
 
+        if conf.VER_GRAFICA_DE_MEJORA_SOLO_PARA_UN_PROBLEMA:
+            historial.append(mejor.beneficio)
+
         #Remplazo
         pop = newpop.copy()
 
         generacion +=1
+
+    if conf.VER_GRAFICA_DE_MEJORA_SOLO_PARA_UN_PROBLEMA:
+        # Graficar los resultados
+        plt.plot(historial)
+        plt.xlabel('Iteraciones')
+        plt.ylabel('Beneficio')
+        if cruce == 1:
+            plt.title('Evolución del Beneficio en AGG 1')
+        elif meme == 1:
+            plt.title('Evolución del Beneficio en AM1')
+        elif meme == 2:
+            plt.title('Evolución del Beneficio en AM2')
+        elif meme == 3:
+            plt.title('Evolución del Beneficio en AM3')
+        else:
+            plt.title('Evolución del Beneficio en AGG')
+        plt.show()
 
     return (mejor_de_pop(pop), evaluadas, eva_bl)
 
@@ -596,7 +613,10 @@ def age(matriz_valor, peso_max, vector_pesos, cruce = 0) -> Solucion:
     p = Problema(matriz_valor, peso_max, vector_pesos)
     pop = p.poblacion_inicial()
     evaluadas = conf.POBLACION
-    pop = sorted(pop, key=lambda x: x.beneficio)
+    
+    if conf.VER_GRAFICA_DE_MEJORA_SOLO_PARA_UN_PROBLEMA:
+        historial = []
+        historial.append(mejor_de_pop(pop).beneficio)
 
     while evaluadas < conf.MAX_EVALUACIONES:
         #Seleccion por torneo
@@ -620,6 +640,16 @@ def age(matriz_valor, peso_max, vector_pesos, cruce = 0) -> Solucion:
 
         #Remplaza los dos peores
         ramplazar_peores(pop, h1, h2)
+        if conf.VER_GRAFICA_DE_MEJORA_SOLO_PARA_UN_PROBLEMA:
+            historial.append(mejor_de_pop(pop).beneficio)
+
+    if conf.VER_GRAFICA_DE_MEJORA_SOLO_PARA_UN_PROBLEMA:
+        # Graficar los resultados
+        plt.plot(historial)
+        plt.xlabel('Iteraciones')
+        plt.ylabel('Beneficio')
+        plt.title('Evolución del Beneficio en AGE')
+        plt.show()
 
     return (mejor_de_pop(pop), evaluadas)
 
