@@ -1,56 +1,69 @@
-todo las ejecucuciones han tardado: 426.91706585884094
+todo las ejecucuciones han tardado: 447.95635414123535
 
 
 [*][·][]Tabla Resultados para BL
    Tamaño  Densidad  Bondad BL  Tiempo BL
-0     100        25    52434.0   0.144424
+0     100        25    52434.0   0.142829
 
 [*][·][]Tabla Resultados para Greedy
    Tamaño  Densidad  Bondad Greedy  Tiempo Greedy
-0     100        25        63178.7       0.001518
+0     100        25        63178.7       0.001501
 
 [*][·][]Tabla Resultados para agg
    Tamaño  Densidad  Bondad agg  Tiempo agg
-0     100        25     56205.0    4.133973
+0     100        25     58692.7    4.482182
 
 [*][·][]Tabla Resultados para agg_1
    Tamaño  Densidad  Bondad agg_1  Tiempo agg_1
-0     100        25       57776.9      7.305799
+0     100        25       57776.9      7.367778
 
 [*][·][]Tabla Resultados para age
    Tamaño  Densidad  Bondad age  Tiempo age
-0     100        25     60152.0    5.923745
+0     100        25     61677.0    5.813768
 
 [*][·][]Tabla Resultados para age_1
    Tamaño  Densidad  Bondad age_1  Tiempo age_1
-0     100        25       58449.1      6.355196
+0     100        25       58449.1      6.361763
 
 [*][·][]Tabla Resultados para am1
    Tamaño  Densidad  Bondad am1  Tiempo am1
-0     100        25     52769.1     5.80019
+0     100        25     55372.1    6.017011
 
 [*][·][]Tabla Resultados para am2
    Tamaño  Densidad  Bondad am2  Tiempo am2
-0     100        25     54798.2    5.197787
+0     100        25     57673.7    5.439541
 
 [*][·][]Tabla Resultados para am3
    Tamaño  Densidad  Bondad am3  Tiempo am3
-0     100        25     60082.0    4.833781
+0     100        25     62857.0    6.223181
 
 [*][·][]Tabla Resultados para BL+
    Tamaño  Densidad  Bondad BL+  Tiempo BL+
-0     100        25     63409.0    2.986426
+0     100        25     63409.0    2.937065
 
 
-[*][·][]Tabla Resultados para Tamaño = 100
+[*][·][]Tabla Resultados para Tamaño = 100 25
   Algoritmo  Fitness    Tiempo
-0       BL+  63409.0  2.986426
-1    Greedy  63178.7  0.001518
-2       Age  60152.0  5.923745
-3       Am3  60082.0  4.833781
-4     Age_1  58449.1  6.355196
-5     Agg_1  57776.9  7.305799
-6       Agg  56205.0  4.133973
-7       Am2  54798.2  5.197787
-8       Am1  52769.1  5.800190
-9        BL  52434.0  0.144424
+0       BL+  63409.0  2.937065
+1    Greedy  63178.7  0.001501
+2       Am3  62857.0  6.223181
+3       Age  61677.0  5.813768
+4       Agg  58692.7  4.482182
+5     Age_1  58449.1  6.361763
+6     Agg_1  57776.9  7.367778
+7       Am2  57673.7  5.439541
+8       Am1  55372.1  6.017011
+9        BL  52434.0  0.142829
+
+[*][·][]Tabla Resultados para Tamaño = 100 todos
+  Algoritmo    Fitness    Tiempo
+0    Greedy  167095.06  0.001550
+1       BL+  165596.35  2.733978
+2       Age  163817.49  5.760161
+3       Am3  163557.04  6.120165
+4     Age_1  161493.59  7.964729
+5       Agg  157135.12  4.323574
+6       Am2  155032.10  5.315900
+7       Am1  150998.88  5.905968
+8     Agg_1  150509.12  6.006475
+9        BL  134635.99  0.142653

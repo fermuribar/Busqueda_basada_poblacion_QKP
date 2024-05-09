@@ -146,9 +146,13 @@ class Problema:
     def completar(self, solucion) -> np.array:
         indices_0 = np.where(solucion == 0)[0]
         aleatorios = np.random.permutation(indices_0)
-        for indice in aleatorios:
-            if self.vector_pesos[indice] <= self.peso_max - np.sum(self.vector_pesos[solucion.astype(bool)]):
-                solucion[indice] = 1
+        peso_dispo = self.peso_max - np.sum(self.vector_pesos[solucion.astype(bool)])
+        i = 0
+        while i < len(aleatorios) and np.any(self.vector_pesos[aleatorios] <= peso_dispo):
+            if self.vector_pesos[aleatorios[i]] <= peso_dispo:
+                 solucion[aleatorios[i]] = 1
+                 peso_dispo -= self.vector_pesos[aleatorios[i]]
+            i+=1
 
         return solucion
     
@@ -229,28 +233,16 @@ class Problema:
         hijo2[indices_cruce.min():indices_cruce.max() + 1] = padre1[indices_cruce.min():indices_cruce.max() + 1].copy()
 
         if not self.factible(hijo1):
-            indices_1_hijo1 = np.where(hijo1 == 1)[0]
-            aleatorios_hijo1 = np.random.permutation(np.arange(0, indices_1_hijo1.shape[0]))
-
-        h = 0
-        while not self.factible(hijo1):
-            hijo1[indices_1_hijo1[aleatorios_hijo1[h]]] = 0
-            h += 1
+            hijo1 = self.factibilizar(hijo1)
 
         if not self.factible(hijo2):
-            indices_1_hijo2 = np.where(hijo2 == 1)[0]
-            aleatorios_hijo2 = np.random.permutation(np.arange(0, indices_1_hijo2.shape[0]))
+            hijo2 = self.factibilizar(hijo2)
 
-        h = 0
-        while not self.factible(hijo2):
-            hijo2[indices_1_hijo2[aleatorios_hijo2[h]]] = 0
-            h += 1
-        
         hijo1 = self.calculo_solucion(hijo1)
         hijo2 = self.calculo_solucion(hijo2)
         return (hijo1, hijo2)
     
-    def cruce_propuesto1(self, padre1, padre2) -> tuple:
+    def cruce_propuesto2(self, padre1, padre2) -> tuple:
         hijo1 = padre1.copy()
         hijo2 = padre2.copy()
 
@@ -268,7 +260,7 @@ class Problema:
         hijo2 = self.calculo_solucion(hijo2)
         return (hijo1, hijo2)
     
-    def cruce_propuesto2(self, padre1, padre2) -> tuple:
+    def cruce_propuesto1(self, padre1, padre2) -> tuple:
         indices_cruce = np.random.randint(0,padre1.shape[0], size=2)
         hijo1 = padre1.copy()
         hijo2 = padre2.copy()
@@ -277,23 +269,31 @@ class Problema:
         hijo2[indices_cruce.min():indices_cruce.max() + 1] = padre1[indices_cruce.min():indices_cruce.max() + 1].copy()
 
         if not self.factible(hijo1):
-            indices_1_hijo1 = np.where(hijo1 == 1)[0]
-            beneficios_hijo1 = self.indices_por_densidad[np.isin(self.indices_por_densidad,indices_1_hijo1)][::-1]
+            for indice in self.indices_por_densidad[::-1]:
+                if hijo1[indice] == 1:
+                    hijo1[indice] = 0
+                    if self.factible(hijo1):
+                        break
 
-        h = 0
-        while not self.factible(hijo1):
-            hijo1[beneficios_hijo1[h]] = 0
-            h += 1
+        peso_dispo = self.peso_max - np.sum(self.vector_pesos[hijo1.astype(bool)])
+        for indice in self.indices_por_densidad:
+            if hijo1[indice] == 0 and self.vector_pesos[indice] <= peso_dispo:
+                 hijo1[indice] = 1
+                 peso_dispo -= self.vector_pesos[indice]
 
         if not self.factible(hijo2):
-            indices_1_hijo2 = np.where(hijo2 == 1)[0]
-            beneficios_hijo2 = self.indices_por_densidad[np.isin(self.indices_por_densidad,indices_1_hijo2)][::-1]
-
-        h = 0
-        while not self.factible(hijo2):
-            hijo2[beneficios_hijo2[h]] = 0
-            h += 1
+            for indice in self.indices_por_densidad[::-1]:
+                if hijo2[indice] == 1:
+                    hijo2[indice] = 0
+                    if self.factible(hijo2):
+                        break
         
+        peso_dispo = self.peso_max - np.sum(self.vector_pesos[hijo2.astype(bool)])
+        for indice in self.indices_por_densidad:
+            if hijo2[indice] == 0 and self.vector_pesos[indice] <= peso_dispo:
+                 hijo2[indice] = 1
+                 peso_dispo -= self.vector_pesos[indice]
+
         hijo1 = self.calculo_solucion(hijo1)
         hijo2 = self.calculo_solucion(hijo2)
         return (hijo1, hijo2)
