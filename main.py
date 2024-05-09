@@ -101,7 +101,7 @@ def main():
         k = 1
         p = 4
     for c in range(k,p):
-        for b in range(1,5):
+        for b in conf.EJECUTAR_D:
             for i in range(1,11):
                 ruta_archivo = "data/jeu_{}_{}_{}.txt".format(c * 100,b * 25,i)  # Reemplaza con la ruta de tu archivo
                 if not os.path.isfile(ruta_archivo):
@@ -240,6 +240,8 @@ def main():
                                                             sol_am1.solucion, sol_am1.peso, sol_am1.beneficio, duracion_am1, 
                                                             sol_am2.solucion, sol_am2.peso, sol_am2.beneficio, duracion_am2, 
                                                             sol_am3.solucion, sol_am3.peso, sol_am3.beneficio, duracion_am3]
+                print('')
+                print('')
                 print('')
     
     if not conf.MOSTRAR_CADA_SALIDA:

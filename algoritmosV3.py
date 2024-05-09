@@ -143,6 +143,25 @@ class Problema:
             return True
         return False
     
+    def completar(self, solucion) -> np.array:
+        indices_0 = np.where(solucion == 0)[0]
+        aleatorios = np.random.permutation(indices_0)
+        for indice in aleatorios:
+            if self.vector_pesos[indice] <= self.peso_max - np.sum(self.vector_pesos[solucion.astype(bool)]):
+                solucion[indice] = 1
+
+        return solucion
+    
+    def factibilizar(self, solucion) -> np.array:
+        indices_1 = np.where(solucion == 1)[0]
+        aleatorios = np.random.permutation(indices_1)
+        for indice in aleatorios:
+            solucion[indice] = 0
+            if self.factible(solucion):
+                break
+        solucion = self.completar(solucion)
+        return solucion
+    
     def calculo_solucion(self, solucion) -> Solucion:
         solucion_calculada = Solucion()
         solucion_calculada.solucion = solucion.copy()
@@ -451,8 +470,10 @@ def agg(matriz_valor, peso_max, vector_pesos, cruce = 0, meme = 0) -> Solucion:
 
     mejor = pop[np.argmax(beneficios)]
     if conf.VER_GRAFICA_DE_MEJORA_SOLO_PARA_UN_PROBLEMA:
-        historial = []
-        historial.append(mejor.beneficio)
+        historial_mejor = []
+        historial_mejor.append(mejor.beneficio)
+        historial_media = []
+        historial_media.append(beneficios.mean())
 
     while evaluadas < conf.MAX_EVALUACIONES:
         #seleccion
@@ -547,7 +568,8 @@ def agg(matriz_valor, peso_max, vector_pesos, cruce = 0, meme = 0) -> Solucion:
             mejor = mejor_new
 
         if conf.VER_GRAFICA_DE_MEJORA_SOLO_PARA_UN_PROBLEMA:
-            historial.append(mejor.beneficio)
+            historial_mejor.append(mejor.beneficio)
+            historial_media.append(beneficios.mean())
 
         #Remplazo
         pop = newpop.copy()
@@ -556,7 +578,8 @@ def agg(matriz_valor, peso_max, vector_pesos, cruce = 0, meme = 0) -> Solucion:
 
     if conf.VER_GRAFICA_DE_MEJORA_SOLO_PARA_UN_PROBLEMA:
         # Graficar los resultados
-        plt.plot(historial)
+        plt.plot(historial_mejor)
+        plt.plot(historial_media)
         plt.xlabel('Iteraciones')
         plt.ylabel('Beneficio')
         if cruce == 1:
@@ -617,6 +640,9 @@ def age(matriz_valor, peso_max, vector_pesos, cruce = 0) -> Solucion:
     if conf.VER_GRAFICA_DE_MEJORA_SOLO_PARA_UN_PROBLEMA:
         historial = []
         historial.append(mejor_de_pop(pop).beneficio)
+        historial_media = []
+        beneficios = np.array([indi.beneficio for indi in pop])
+        historial_media.append(beneficios.mean())
 
     while evaluadas < conf.MAX_EVALUACIONES:
         #Seleccion por torneo
@@ -642,10 +668,13 @@ def age(matriz_valor, peso_max, vector_pesos, cruce = 0) -> Solucion:
         ramplazar_peores(pop, h1, h2)
         if conf.VER_GRAFICA_DE_MEJORA_SOLO_PARA_UN_PROBLEMA:
             historial.append(mejor_de_pop(pop).beneficio)
+            beneficios = np.array([indi.beneficio for indi in pop])
+            historial_media.append(beneficios.mean())
 
     if conf.VER_GRAFICA_DE_MEJORA_SOLO_PARA_UN_PROBLEMA:
         # Graficar los resultados
         plt.plot(historial)
+        plt.plot(historial_media)
         plt.xlabel('Iteraciones')
         plt.ylabel('Beneficio')
         if cruce == 1:
