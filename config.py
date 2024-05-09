@@ -22,7 +22,7 @@ SOLO_EJECUTAR_300 = False
 HACER_TXT_DE_TABLA_EJECUCION = False
 
 VER_GRAFICA_DE_MEJORA_SOLO_PARA_UN_PROBLEMA = True 
-PROBLEMA_PARA_VER_GRAFICA = 'data/jeu_300_50_5.txt'
+PROBLEMA_PARA_VER_GRAFICA = 'data/jeu_200_50_5.txt'
 
 CLEAR = 'clear' #comando para limpiar pantalla en tu SO
 

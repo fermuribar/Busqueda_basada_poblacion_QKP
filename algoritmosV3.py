@@ -648,7 +648,10 @@ def age(matriz_valor, peso_max, vector_pesos, cruce = 0) -> Solucion:
         plt.plot(historial)
         plt.xlabel('Iteraciones')
         plt.ylabel('Beneficio')
-        plt.title('Evolución del Beneficio en AGE')
+        if cruce == 1:
+            plt.title('Evolución del Beneficio en AGE 1')
+        else:
+            plt.title('Evolución del Beneficio en AGE')
         plt.show()
 
     return (mejor_de_pop(pop), evaluadas)
