@@ -277,7 +277,7 @@ class Problema:
     
     #operador propuesto: es igual que el curuce en dos puntos pero en el momento de factivilizar la soluciones obtenidas 
         #y completar la solucion se usa informacion del problema con el beneficio/peso.
-    def cruce_propuesto2(self, padre1, padre2) -> tuple:
+    def cruce_propuesto1(self, padre1, padre2) -> tuple:
         indices_cruce = np.random.randint(0,padre1.shape[0], size=2)
         hijo1 = padre1.copy()
         hijo2 = padre2.copy()
@@ -315,9 +315,9 @@ class Problema:
         hijo2 = self.calculo_solucion(hijo2)
         return (hijo1, hijo2)
     
-    def cruce_propuesto1(self, padre1, padre2) -> tuple:
-        hijo1 = padre1 & padre2 #and
-        hijo2 = padre1 ^ padre2 #xor
+    def cruce_propuesto2(self, padre1, padre2) -> tuple:
+        hijo1 = np.logical_and(padre1, padre2)
+        hijo2 = np.logical_xor(padre1, padre2)
 
 
         if not self.factible(hijo1):
