@@ -267,6 +267,10 @@ class Problema:
                 if not self.factible(hijo2):
                     hijo2[i] = 0
 
+
+        hijo1 = self.completar(hijo1)
+        hijo2 = self.completar(hijo2)
+
         hijo1 = self.calculo_solucion(hijo1)
         hijo2 = self.calculo_solucion(hijo2)
         return (hijo1, hijo2)
