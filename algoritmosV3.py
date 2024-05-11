@@ -137,12 +137,14 @@ class Problema:
 
         return self.solucion_actual
 
+    #comprueba si una solucion es factible
     def factible(self,solucion) -> bool:
         peso_solucion_explorar = np.sum(self.vector_pesos[solucion.astype(bool)])
         if peso_solucion_explorar <= self.peso_max:
             return True
         return False
     
+    #metodo para rellenar la mochila con elementos que aun quepan en ella
     def completar(self, solucion) -> np.array:
         indices_0 = np.where(solucion == 0)[0]
         aleatorios = np.random.permutation(indices_0)
@@ -156,6 +158,8 @@ class Problema:
 
         return solucion
     
+    #metodo para hacer que una solucion no factible se haga factible (aleatoriamente)
+        #al final se llama a completar
     def factibilizar(self, solucion) -> np.array:
         indices_1 = np.where(solucion == 1)[0]
         aleatorios = np.random.permutation(indices_1)
@@ -166,14 +170,15 @@ class Problema:
         solucion = self.completar(solucion)
         return solucion
     
+    #calcula todos los parametros de la estructura soluciuon
     def calculo_solucion(self, solucion) -> Solucion:
         solucion_calculada = Solucion()
         solucion_calculada.solucion = solucion.copy()
         solucion_calculada.peso = np.sum(self.vector_pesos[solucion.astype(bool)])
         solucion_calculada.beneficio = np.sum(self.matriz_valor[solucion.astype(bool), :][:, solucion.astype(bool)])
         return solucion_calculada
-
     
+    #calcula los parametros "factorizando" de una solucion a partir de una anterior
     def factorizacion(self, solucion, permutacion) -> Solucion:
         solucion_calculada = Solucion()
         solucion_calculada.solucion = solucion.copy()
@@ -186,7 +191,8 @@ class Problema:
              solucion_calculada.beneficio = solucion_calculada.beneficio + np.sum(self.matriz_valor[permutacion[2], :][solucion.astype(bool)]) * 2 - self.matriz_valor[permutacion[2], permutacion[2]] - self.matriz_valor[permutacion[1],permutacion[2]] * 2
         return solucion_calculada
 
-    #toma como la sulucion en la que buscara su entorno la solucion_actual    
+    #obtencion del primer mejor vecino de un vecindario (BL)
+        #toma como la sulucion en la que buscara su entorno la solucion_actual    
     def primer_mejor_vecino(self, N, vecindario = 0, lim = 0) -> bool: #vecindario 0 (vecindario pequeño)
        #en esta busqueda de entorno solo se generan permutaciones de objetos (es decir no aumenta el numero de objetos elegedio en la solucion inicial)
         v = Vecindarios(self.solucion_actual.solucion,vecindario)
@@ -214,6 +220,7 @@ class Problema:
             
         return False
     
+    #crea una poblacion de soluciones aleatorias
     def poblacion_inicial(self) -> list:
         pop = []
         for i in range(0,conf.POBLACION):
@@ -224,6 +231,7 @@ class Problema:
             pop.append(self.solucion_inicial())
         return pop
     
+    #operador de cure en dos puntos
     def cruce_intercambio_puntos(self, padre1, padre2) -> tuple:
         indices_cruce = np.random.randint(0,padre1.shape[0], size=2)
         hijo1 = padre1.copy()
@@ -242,6 +250,9 @@ class Problema:
         hijo2 = self.calculo_solucion(hijo2)
         return (hijo1, hijo2)
     
+    #operador propuesto: se copian los padres (hijo1 = padre1) y se intentan añadir mas objetos del otro padre
+        #con prioridad de beneficio/peso. POCO EFICIENTE; hipotesis: como las soluciones de partidas ya eran factibles 
+        #y "completas" no se copian del padre2 nada. Es decir las soluciones no se diferencian muchos de los padres.
     def cruce_propuesto2(self, padre1, padre2) -> tuple:
         hijo1 = padre1.copy()
         hijo2 = padre2.copy()
@@ -260,6 +271,8 @@ class Problema:
         hijo2 = self.calculo_solucion(hijo2)
         return (hijo1, hijo2)
     
+    #operador propuesto: es igual que el curuce en dos puntos pero en el momento de factivilizar la soluciones obtenidas 
+        #y completar la solucion se usa informacion del problema con el beneficio/peso.
     def cruce_propuesto1(self, padre1, padre2) -> tuple:
         indices_cruce = np.random.randint(0,padre1.shape[0], size=2)
         hijo1 = padre1.copy()
@@ -298,7 +311,7 @@ class Problema:
         hijo2 = self.calculo_solucion(hijo2)
         return (hijo1, hijo2)
     
-
+    #operador de mutacion
     def mutacion(self, sol) -> Solucion:
         mutada = sol.copy()
         m = 0
