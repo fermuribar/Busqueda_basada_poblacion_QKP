@@ -253,7 +253,7 @@ class Problema:
     #operador propuesto: se copian los padres (hijo1 = padre1) y se intentan añadir mas objetos del otro padre
         #con prioridad de beneficio/peso. POCO EFICIENTE; hipotesis: como las soluciones de partidas ya eran factibles 
         #y "completas" no se copian del padre2 nada. Es decir las soluciones no se diferencian muchos de los padres.
-    def cruce_propuesto2(self, padre1, padre2) -> tuple:
+    def cruce_propuesto3(self, padre1, padre2) -> tuple:
         hijo1 = padre1.copy()
         hijo2 = padre2.copy()
 
@@ -277,13 +277,48 @@ class Problema:
     
     #operador propuesto: es igual que el curuce en dos puntos pero en el momento de factivilizar la soluciones obtenidas 
         #y completar la solucion se usa informacion del problema con el beneficio/peso.
-    def cruce_propuesto1(self, padre1, padre2) -> tuple:
+    def cruce_propuesto2(self, padre1, padre2) -> tuple:
         indices_cruce = np.random.randint(0,padre1.shape[0], size=2)
         hijo1 = padre1.copy()
         hijo2 = padre2.copy()
         
         hijo1[indices_cruce.min():indices_cruce.max() + 1] = padre2[indices_cruce.min():indices_cruce.max() + 1].copy()
         hijo2[indices_cruce.min():indices_cruce.max() + 1] = padre1[indices_cruce.min():indices_cruce.max() + 1].copy()
+
+        if not self.factible(hijo1):
+            for indice in self.indices_por_densidad[::-1]:
+                if hijo1[indice] == 1:
+                    hijo1[indice] = 0
+                    if self.factible(hijo1):
+                        break
+
+        peso_dispo = self.peso_max - np.sum(self.vector_pesos[hijo1.astype(bool)])
+        for indice in self.indices_por_densidad:
+            if hijo1[indice] == 0 and self.vector_pesos[indice] <= peso_dispo:
+                 hijo1[indice] = 1
+                 peso_dispo -= self.vector_pesos[indice]
+
+        if not self.factible(hijo2):
+            for indice in self.indices_por_densidad[::-1]:
+                if hijo2[indice] == 1:
+                    hijo2[indice] = 0
+                    if self.factible(hijo2):
+                        break
+        
+        peso_dispo = self.peso_max - np.sum(self.vector_pesos[hijo2.astype(bool)])
+        for indice in self.indices_por_densidad:
+            if hijo2[indice] == 0 and self.vector_pesos[indice] <= peso_dispo:
+                 hijo2[indice] = 1
+                 peso_dispo -= self.vector_pesos[indice]
+
+        hijo1 = self.calculo_solucion(hijo1)
+        hijo2 = self.calculo_solucion(hijo2)
+        return (hijo1, hijo2)
+    
+    def cruce_propuesto1(self, padre1, padre2) -> tuple:
+        hijo1 = padre1 & padre2 #and
+        hijo2 = padre1 ^ padre2 #xor
+
 
         if not self.factible(hijo1):
             for indice in self.indices_por_densidad[::-1]:
