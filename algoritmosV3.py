@@ -121,7 +121,7 @@ class Problema:
         self.solucion_actual.peso = peso_max
         self.solucion_actual.beneficio = 0
 
-        densidades = np.diag(matriz_valor) / vector_pesos
+        densidades = np.sum(matriz_valor, axis=1) / vector_pesos #antes era beneficio unitario 
         self.indices_por_densidad = np.argsort(densidades)[::-1]
     
     #da una solucion inicial aleatoria 
@@ -276,7 +276,7 @@ class Problema:
         return (hijo1, hijo2)
     
     #operador propuesto: es igual que el curuce en dos puntos pero en el momento de factivilizar la soluciones obtenidas 
-        #y completar la solucion se usa informacion del problema con el beneficio/peso.
+        #y completar la solucion se usa informacion del problema con el beneficio/peso. ultimo en term
     def cruce_propuesto1(self, padre1, padre2) -> tuple:
         indices_cruce = np.random.randint(0,padre1.shape[0], size=2)
         hijo1 = padre1.copy()
