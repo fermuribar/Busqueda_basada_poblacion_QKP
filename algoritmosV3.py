@@ -552,7 +552,7 @@ def agg(matriz_valor, peso_max, vector_pesos, cruce = 0, meme = 0) -> Solucion:
             newpop[i] = h1
             newpop[i+1] = h2
             i += 2
-            #evaluadas += 2 ##esto no lo cuente en teoria no deberias evaluar muy importante comentarlo.
+            evaluadas += 2 ##esto no lo cuente en teoria no deberias evaluar muy importante comentarlo.
 
         #mutacion
         total_mutar = conf.POBLACION*conf.PROBABILIDAD_MUTACION
@@ -560,9 +560,9 @@ def agg(matriz_valor, peso_max, vector_pesos, cruce = 0, meme = 0) -> Solucion:
         for i in range(0, int(total_mutar)):
             posi = np.random.randint(0, conf.POBLACION)
             newpop[posi] = p.mutacion(pop[posi].solucion)
-            #evaluadas += 1
+            if posi >= total_cruces: # para no contar los cruces
+                evaluadas += 1
 
-        evaluadas += conf.POBLACION
 
         if meme != 0 and generacion % 10 == 0:  #mover antes de incluso el elitismo-----------________________------------___________
             if meme == 1:
