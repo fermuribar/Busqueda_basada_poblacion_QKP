@@ -361,6 +361,8 @@ class Problema:
                 m += 1
             else:
                 mutada[indices_mutado] = 1 if mutada[indices_mutado] == 0 else 0
+
+        mutada = self.completar(mutada)
         
         return self.calculo_solucion(mutada)
 
