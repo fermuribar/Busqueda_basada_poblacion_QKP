@@ -552,7 +552,7 @@ def agg(matriz_valor, peso_max, vector_pesos, cruce = 0, meme = 0) -> Solucion:
             newpop[i] = h1
             newpop[i+1] = h2
             i += 2
-            evaluadas += 2 ##esto no lo cuente en teoria no deberias evaluar muy importante comentarlo.
+            evaluadas += 2 
 
         #mutacion
         total_mutar = conf.POBLACION*conf.PROBABILIDAD_MUTACION
@@ -658,30 +658,24 @@ def agg(matriz_valor, peso_max, vector_pesos, cruce = 0, meme = 0) -> Solucion:
 #  /_/    \_\_____|______|
 
 def ramplazar_peores(pop, h1, h2):
-    sw = False
     beneficios = np.array([indi.beneficio for indi in pop])
     ind_orden = np.argsort(beneficios)
-
     if h1.beneficio > h2.beneficio:
         if h1.beneficio > pop[ind_orden[2]].beneficio:
             pop[ind_orden[1]] = h1
             if h2.beneficio > pop[ind_orden[1]].beneficio:
                 pop[ind_orden[2]] = h2
-            sw = True
         else:
             if h1.beneficio > pop[-1].beneficio:
                 pop[ind_orden[2]] = h1
-                sw = True
     else:
         if h2.beneficio > pop[ind_orden[2]].beneficio:
             pop[ind_orden[2]] = h2
             if h1.beneficio > pop[ind_orden[1]].beneficio:
                 pop[ind_orden[1]] = h1
-            sw = True
         else:
             if h2.beneficio > pop[ind_orden[1]].beneficio:
                 pop[ind_orden[1]] = h2
-                sw = True
 
 
 
