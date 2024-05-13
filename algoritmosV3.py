@@ -564,7 +564,7 @@ def agg(matriz_valor, peso_max, vector_pesos, cruce = 0, meme = 0) -> Solucion:
                 evaluadas += 1
 
 
-        if meme != 0 and generacion % 10 == 0:  #mover antes de incluso el elitismo-----------________________------------___________
+        if meme != 0 and generacion % 10 == 0:  
             if meme == 1:
                 for cromosoma in newpop:
                     if evaluadas >= conf.MAX_EVALUACIONES:
