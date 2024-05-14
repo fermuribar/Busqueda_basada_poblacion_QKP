@@ -409,7 +409,7 @@ def BL_primer_mejor(matriz_valor, peso_max, vector_pesos, vecindario = 0) -> Sol
             else:
                 plt.scatter(i, beneficio, color='blue')
 
-        plt.xlabel('Iteraciones')
+        plt.xlabel('Vecindarios')
         plt.ylabel('Beneficio')
         if vecindario == 1:
             plt.title('Evolución del Beneficio en BL+')
@@ -634,7 +634,7 @@ def agg(matriz_valor, peso_max, vector_pesos, cruce = 0, meme = 0) -> Solucion:
         # Graficar los resultados
         plt.plot(historial_mejor)
         plt.plot(historial_media)
-        plt.xlabel('Iteraciones')
+        plt.xlabel('Generaciones')
         plt.ylabel('Beneficio')
         if cruce == 1:
             plt.title('Evolución del Beneficio en AGG 1')
@@ -723,7 +723,7 @@ def age(matriz_valor, peso_max, vector_pesos, cruce = 0) -> Solucion:
         # Graficar los resultados
         plt.plot(historial)
         plt.plot(historial_media)
-        plt.xlabel('Iteraciones')
+        plt.xlabel('Generaciones')
         plt.ylabel('Beneficio')
         if cruce == 1:
             plt.title('Evolución del Beneficio en AGE 1')

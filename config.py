@@ -24,7 +24,7 @@ EJECUTAR_D = [1,2,3,4] #Todo: [1,2,3,4]
 HACER_TXT_DE_TABLA_EJECUCION = False
 
 VER_GRAFICA_DE_MEJORA_SOLO_PARA_UN_PROBLEMA = False 
-PROBLEMA_PARA_VER_GRAFICA = 'data/jeu_200_50_5.txt'
+PROBLEMA_PARA_VER_GRAFICA = 'data/jeu_300_50_4.txt'
 
 CLEAR = 'clear' #comando para limpiar pantalla en tu SO
 
