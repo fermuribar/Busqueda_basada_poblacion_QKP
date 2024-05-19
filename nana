@@ -7736,3 +7736,61 @@ todo las ejecucuciones han tardado: 8863.12129497528
 7       Am1  673000.15  12.685315
 8       BL+  622371.01  31.188677
 9        BL  605240.40   1.544865
+
+
+fermuribar@MacFer Busqueda_basada_poblacion_QKP % /usr/bin/python3 /Users/fermuribar/Desktop/Busqueda_basada_poblacion_QKP/main.py
+BL -> (data/jeu_100_50_4.txt) Con un peso disponible de: 2    y bondad total de: 197829.0
+
+BL+ -> (data/jeu_100_50_4.txt) Con un peso disponible de: 1    y bondad total de: 209589.0
+
+Agg -> (data/jeu_100_50_4.txt) Con un peso disponible de: 2    y bondad total de: 208607.0 || evaluaciones: 90019
+
+Agg_1 -> (data/jeu_100_50_4.txt) Con un peso disponible de: 5    y bondad total de: 209773.0 || evaluaciones: 90000
+
+Age -> (data/jeu_100_50_4.txt) Con un peso disponible de: 4    y bondad total de: 209579.0 || evaluaciones: 90000
+
+Age_1 -> (data/jeu_100_50_4.txt) Con un peso disponible de: 0    y bondad total de: 209773.0 || evaluaciones: 90000
+
+Am1 -> (data/jeu_100_50_4.txt) Con un peso disponible de: 0    y bondad total de: 206941.0 || evaluaciones P: 6014;  evaluaciones bl: 83986
+
+Am2 -> (data/jeu_100_50_4.txt) Con un peso disponible de: 0    y bondad total de: 205947.0 || evaluaciones P: 37431;  evaluaciones bl: 52569
+
+Am3 -> (data/jeu_100_50_4.txt) Con un peso disponible de: 216    y bondad total de: 209589.0 || evaluaciones P: 38713;  evaluaciones bl: 51309
+
+fermuribar@MacFer Busqueda_basada_poblacion_QKP % /usr/bin/python3 /Users/fermuribar/Desktop/Busqueda_basada_poblacion_QKP/main.py
+BL -> (data/jeu_200_50_4.txt) Con un peso disponible de: 5    y bondad total de: 275894.0
+
+BL+ -> (data/jeu_200_50_4.txt) Con un peso disponible de: 4    y bondad total de: 309455.0
+
+Agg -> (data/jeu_200_50_4.txt) Con un peso disponible de: 118    y bondad total de: 394031.0 || evaluaciones: 90018
+
+Agg_1 -> (data/jeu_200_50_4.txt) Con un peso disponible de: 0    y bondad total de: 453854.0 || evaluaciones: 90012
+
+Age -> (data/jeu_200_50_4.txt) Con un peso disponible de: 3    y bondad total de: 423844.0 || evaluaciones: 90000
+
+Age_1 -> (data/jeu_200_50_4.txt) Con un peso disponible de: 6    y bondad total de: 447399.0 || evaluaciones: 90000
+
+Am1 -> (data/jeu_200_50_4.txt) Con un peso disponible de: 0    y bondad total de: 330148.0 || evaluaciones P: 3231;  evaluaciones bl: 86769
+
+Am2 -> (data/jeu_200_50_4.txt) Con un peso disponible de: 0    y bondad total de: 387478.0 || evaluaciones P: 23701;  evaluaciones bl: 66299
+
+Am3 -> (data/jeu_200_50_4.txt) Con un peso disponible de: 373    y bondad total de: 417533.0 || evaluaciones P: 23733;  evaluaciones bl: 66267
+
+fermuribar@MacFer Busqueda_basada_poblacion_QKP % /usr/bin/python3 /Users/fermuribar/Desktop/Busqueda_basada_poblacion_QKP/main.py
+BL -> (data/jeu_300_50_4.txt) Con un peso disponible de: 6    y bondad total de: 245425.0
+
+BL+ -> (data/jeu_300_50_4.txt) Con un peso disponible de: 5    y bondad total de: 257463.0
+
+Agg -> (data/jeu_300_50_4.txt) Con un peso disponible de: 235    y bondad total de: 477857.0 || evaluaciones: 90007
+
+Agg_1 -> (data/jeu_300_50_4.txt) Con un peso disponible de: 0    y bondad total de: 608813.0 || evaluaciones: 90011
+
+Age -> (data/jeu_300_50_4.txt) Con un peso disponible de: 5    y bondad total de: 527409.0 || evaluaciones: 90000
+
+Age_1 -> (data/jeu_300_50_4.txt) Con un peso disponible de: 5    y bondad total de: 598726.0 || evaluaciones: 90000
+
+Am1 -> (data/jeu_300_50_4.txt) Con un peso disponible de: 0    y bondad total de: 327345.0 || evaluaciones P: 2166;  evaluaciones bl: 87834
+
+Am2 -> (data/jeu_300_50_4.txt) Con un peso disponible de: 1    y bondad total de: 441150.0 || evaluaciones P: 17337;  evaluaciones bl: 72663
+
+Am3 -> (data/jeu_300_50_4.txt) Con un peso disponible de: 255    y bondad total de: 498634.0 || evaluaciones P: 17348;  evaluaciones bl: 72652
