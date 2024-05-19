@@ -756,6 +756,7 @@ def age_AM(matriz_valor, peso_max, vector_pesos, cruce = 0, meme = 0) -> Solucio
     pop = p.poblacion_inicial()
     evaluadas = conf.POBLACION
     eva_bl = 0
+    generacion = 1
     
     if conf.VER_GRAFICA_DE_MEJORA_SOLO_PARA_UN_PROBLEMA:
         historial = []
@@ -787,49 +788,52 @@ def age_AM(matriz_valor, peso_max, vector_pesos, cruce = 0, meme = 0) -> Solucio
         #Remplaza los dos peores
         ramplazar_peores(pop, h1, h2)
 
-        if meme == 1:
-            for cromosoma in pop:
-                if evaluadas >= conf.MAX_EVALUACIONES:
-                    break
-                elif conf.MAX_EVALUACIONES - evaluadas < cromosoma.solucion.shape[0]:
-                    lim = conf.MAX_EVALUACIONES - evaluadas
-                else:
-                    lim = cromosoma.solucion.shape[0]
+        if meme != 0 and generacion % 50 == 0:  
+            if meme == 1:
+                for cromosoma in pop:
+                    if evaluadas >= conf.MAX_EVALUACIONES:
+                        break
+                    elif conf.MAX_EVALUACIONES - evaluadas < cromosoma.solucion.shape[0]:
+                        lim = conf.MAX_EVALUACIONES - evaluadas
+                    else:
+                        lim = cromosoma.solucion.shape[0]
 
-                N = [1]
-                cromosoma = BL_primer_mejor_meme(matriz_valor, peso_max, vector_pesos, cromosoma, N, lim)
-                evaluadas += N[0]
-                eva_bl += N[0]
-        elif meme == 2:
-            cromosomas_BL = conf.POBLACION * conf.PROBABILIDAD_MEME2
-            for i in range(0, int(cromosomas_BL)):
-                cromosoma = pop[np.random.randint(0, conf.POBLACION)]
-                if evaluadas >= conf.MAX_EVALUACIONES:
-                    break
-                elif conf.MAX_EVALUACIONES - evaluadas < cromosoma.solucion.shape[0]:
-                    lim = conf.MAX_EVALUACIONES - evaluadas
-                else:
-                    lim = cromosoma.solucion.shape[0]
+                    N = [1]
+                    cromosoma = BL_primer_mejor_meme(matriz_valor, peso_max, vector_pesos, cromosoma, N, lim)
+                    evaluadas += N[0]
+                    eva_bl += N[0]
+            elif meme == 2:
+                cromosomas_BL = conf.POBLACION * conf.PROBABILIDAD_MEME2
+                for i in range(0, int(cromosomas_BL)):
+                    cromosoma = pop[np.random.randint(0, conf.POBLACION)]
+                    if evaluadas >= conf.MAX_EVALUACIONES:
+                        break
+                    elif conf.MAX_EVALUACIONES - evaluadas < cromosoma.solucion.shape[0]:
+                        lim = conf.MAX_EVALUACIONES - evaluadas
+                    else:
+                        lim = cromosoma.solucion.shape[0]
 
-                N = [1]
-                cromosoma = BL_primer_mejor_meme(matriz_valor, peso_max, vector_pesos, cromosoma, N, lim)
-                evaluadas += N[0]
-                eva_bl += N[0]
-        elif meme == 3:
-            pop = sorted(pop, key=lambda x : x.beneficio)[::-1]
-            cromosomas_BL = conf.POBLACION * conf.PROBABILIDAD_MEME2
-            for i in range(0, int(cromosomas_BL)):
-                if evaluadas >= conf.MAX_EVALUACIONES:
-                    break
-                elif conf.MAX_EVALUACIONES - evaluadas < pop[0].solucion.shape[0]:
-                    lim = conf.MAX_EVALUACIONES - evaluadas
-                else:
-                    lim = pop[0].solucion.shape[0]
+                    N = [1]
+                    cromosoma = BL_primer_mejor_meme(matriz_valor, peso_max, vector_pesos, cromosoma, N, lim)
+                    evaluadas += N[0]
+                    eva_bl += N[0]
+            elif meme == 3:
+                pop = sorted(pop, key=lambda x : x.beneficio)[::-1]
+                cromosomas_BL = conf.POBLACION * conf.PROBABILIDAD_MEME2
+                for i in range(0, int(cromosomas_BL)):
+                    if evaluadas >= conf.MAX_EVALUACIONES:
+                        break
+                    elif conf.MAX_EVALUACIONES - evaluadas < pop[0].solucion.shape[0]:
+                        lim = conf.MAX_EVALUACIONES - evaluadas
+                    else:
+                        lim = pop[0].solucion.shape[0]
 
-                N = [1]
-                pop[i] = BL_primer_mejor_meme(matriz_valor, peso_max, vector_pesos, pop[i], N, lim)
-                evaluadas += N[0]
-                eva_bl += N[0]
+                    N = [1]
+                    pop[i] = BL_primer_mejor_meme(matriz_valor, peso_max, vector_pesos, pop[i], N, lim)
+                    evaluadas += N[0]
+                    eva_bl += N[0]
+
+        generacion += 1
 
         if conf.VER_GRAFICA_DE_MEJORA_SOLO_PARA_UN_PROBLEMA:
             historial.append(mejor_de_pop(pop).beneficio)
