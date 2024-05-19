@@ -733,3 +733,101 @@ def age(matriz_valor, peso_max, vector_pesos, cruce = 0) -> Solucion:
 
     return (mejor_de_pop(pop), evaluadas)
 
+def age_AM(matriz_valor, peso_max, vector_pesos, cruce = 0, meme = 0) -> Solucion:
+    p = Problema(matriz_valor, peso_max, vector_pesos)
+    pop = p.poblacion_inicial()
+    evaluadas = conf.POBLACION
+    eva_bl = 0
+    
+    if conf.VER_GRAFICA_DE_MEJORA_SOLO_PARA_UN_PROBLEMA:
+        historial = []
+        historial.append(mejor_de_pop(pop).beneficio)
+        historial_media = []
+        beneficios = np.array([indi.beneficio for indi in pop])
+        historial_media.append(beneficios.mean())
+
+    while evaluadas < conf.MAX_EVALUACIONES:
+        #Seleccion por torneo
+        padre1 = torneo_de_tres(pop)
+        padre2 = torneo_de_tres(pop)
+
+        #cruce
+        if cruce == 0:
+            h1, h2 = p.cruce_intercambio_puntos(padre1.solucion,padre2.solucion)
+        elif cruce == 1:
+            h1, h2 = p.cruce_propuesto1(padre1.solucion,padre2.solucion)
+
+        #mutacion
+        if conf.PROBABILIDAD_MUTACION >= np.random.rand():
+            h1 = p.mutacion(h1.solucion)
+
+        if conf.PROBABILIDAD_MUTACION >= np.random.rand():
+            h2 = p.mutacion(h2.solucion)
+        
+        evaluadas += 2
+
+        #Remplaza los dos peores
+        ramplazar_peores(pop, h1, h2)
+
+        if meme == 1:
+            for cromosoma in pop:
+                if evaluadas >= conf.MAX_EVALUACIONES:
+                    break
+                elif conf.MAX_EVALUACIONES - evaluadas < cromosoma.solucion.shape[0]:
+                    lim = conf.MAX_EVALUACIONES - evaluadas
+                else:
+                    lim = cromosoma.solucion.shape[0]
+
+                N = [1]
+                cromosoma = BL_primer_mejor_meme(matriz_valor, peso_max, vector_pesos, cromosoma, N, lim)
+                evaluadas += N[0]
+                eva_bl += N[0]
+        elif meme == 2:
+            cromosomas_BL = conf.POBLACION * conf.PROBABILIDAD_MEME2
+            for i in range(0, int(cromosomas_BL)):
+                cromosoma = pop[np.random.randint(0, conf.POBLACION)]
+                if evaluadas >= conf.MAX_EVALUACIONES:
+                    break
+                elif conf.MAX_EVALUACIONES - evaluadas < cromosoma.solucion.shape[0]:
+                    lim = conf.MAX_EVALUACIONES - evaluadas
+                else:
+                    lim = cromosoma.solucion.shape[0]
+
+                N = [1]
+                cromosoma = BL_primer_mejor_meme(matriz_valor, peso_max, vector_pesos, cromosoma, N, lim)
+                evaluadas += N[0]
+                eva_bl += N[0]
+        elif meme == 3:
+            pop = sorted(pop, key=lambda x : x.beneficio)[::-1]
+            cromosomas_BL = conf.POBLACION * conf.PROBABILIDAD_MEME2
+            for i in range(0, int(cromosomas_BL)):
+                if evaluadas >= conf.MAX_EVALUACIONES:
+                    break
+                elif conf.MAX_EVALUACIONES - evaluadas < pop[0].solucion.shape[0]:
+                    lim = conf.MAX_EVALUACIONES - evaluadas
+                else:
+                    lim = pop[0].solucion.shape[0]
+
+                N = [1]
+                pop[i] = BL_primer_mejor_meme(matriz_valor, peso_max, vector_pesos, pop[i], N, lim)
+                evaluadas += N[0]
+                eva_bl += N[0]
+
+        if conf.VER_GRAFICA_DE_MEJORA_SOLO_PARA_UN_PROBLEMA:
+            historial.append(mejor_de_pop(pop).beneficio)
+            beneficios = np.array([indi.beneficio for indi in pop])
+            historial_media.append(beneficios.mean())
+
+    if conf.VER_GRAFICA_DE_MEJORA_SOLO_PARA_UN_PROBLEMA:
+        # Graficar los resultados
+        plt.plot(historial)
+        plt.plot(historial_media)
+        plt.xlabel('Generaciones')
+        plt.ylabel('Beneficio')
+        if cruce == 1:
+            plt.title('Evolución del Beneficio en AGE 1')
+        else:
+            plt.title('Evolución del Beneficio en AGE')
+        plt.show()
+
+    return (mejor_de_pop(pop), evaluadas, eva_bl)
