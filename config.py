@@ -9,7 +9,7 @@
 SEMILLA = 777
 MAX_EVALUACIONES = 90000
 ENTENDER_FACTIVILIDAD_DE_SOLUCION_COMO_PARTE_FUNCION_OBJETIVO = False
-# ^ Si esta a true la ajecucion de todos los problemas con MEJORA_BL tarda unos 5 min | si False tarda 15 min
+# ^ Si esta a true la ajecucion de todos los problemas con MEJORA_BL 
 MEJORA_BL = True
 
 MOSTRAR_CADA_SALIDA = True

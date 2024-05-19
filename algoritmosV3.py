@@ -276,7 +276,7 @@ class Problema:
         return (hijo1, hijo2)
     
     #operador propuesto: es igual que el curuce en dos puntos pero en el momento de factivilizar la soluciones obtenidas 
-        #y completar la solucion se usa informacion del problema con el beneficio/peso. ultimo en term
+        #y completar la solucion se usa informacion del problema con el beneficio/peso.
     def cruce_propuesto1(self, padre1, padre2) -> tuple:
         indices_cruce = np.random.randint(0,padre1.shape[0], size=2)
         hijo1 = padre1.copy()
